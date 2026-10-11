@@ -158,6 +158,16 @@ td{font-size:13px}
 .hr{display:contents}
 .range{font-size:12px;color:var(--txm);margin:-20px 0 24px}
 .range:empty{display:none}
+.depo.four{grid-template-columns:repeat(4,1fr)}
+.cb{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.cbi{border:1px solid var(--bd);border-radius:6px;padding:14px 16px;background:var(--bg)}
+.cbi.warn{border-color:rgba(217,103,93,.55)}
+.cbh{display:flex;justify-content:space-between;align-items:baseline;font-size:13px}
+.cbn{font-weight:700;font-size:14px}
+.cbv{font:500 20px 'Inter',sans-serif;margin:6px 0 2px}
+.cbw{font-size:11px;color:var(--red);margin-top:8px}
+#monthTable{min-width:560px}
+@media(max-width:900px){.depo.four{grid-template-columns:repeat(2,1fr)}}
 
 @media(max-width:1200px){.stats{grid-template-columns:repeat(3,1fr)}.stat:first-child{grid-column:1/-1}}
 @media(max-width:900px){.container{padding:20px 16px 48px}.stats{grid-template-columns:repeat(2,1fr)}.depo{grid-template-columns:repeat(2,1fr)}}
@@ -202,13 +212,23 @@ td{font-size:13px}
 
 <section class="depo" id="depoPanel" aria-label="Депозит"></section>
 
+<section class="card" id="coinBalCard" style="display:none"><div class="ch"><div class="ct"><div class="ci">💰</div>Баланс по монетам</div><div class="badge" id="coinBalBadge"></div></div>
+<div class="cb" id="coinBalances"></div><div class="hnote" id="coinBalNote"></div></section>
+
 <div id="empty"><h2>Нет сделок за выбранный период</h2><p>Расширьте период или сбросьте фильтры направления и актива.</p></div>
 
 <div id="content">
 <section class="stats" id="statsGrid" aria-label="Ключевые метрики"></section>
 
+<section class="depo four" id="riskPanel" aria-label="Просадка и скользящие метрики"></section>
+
 <section class="card"><div class="ch"><div class="ct"><div class="ci">📈</div>Накопленный PnL и просадка</div><div class="badge" id="equityBadge">—</div></div>
 <div class="cc lg"><canvas id="equityChart" role="img" aria-label="График накопленного PnL и просадки"></canvas></div></section>
+
+<section class="card"><div class="ch"><div class="ct"><div class="ci">📉</div>Скользящие метрики</div><div class="badge" id="rollBadge">—</div></div>
+<div class="cc sm" id="rollWrap"><canvas id="rollChart" role="img" aria-label="Скользящее матожидание и winrate"></canvas></div>
+<div class="hnote" id="rollMsg" style="display:none"></div>
+<div class="hnote" id="rollNote"></div></section>
 
 <div class="g2">
   <section class="card"><div class="ch"><div class="ct"><div class="ci">📊</div>Дневной PnL</div></div><div class="cc"><canvas id="dailyChart" role="img" aria-label="Дневной PnL"></canvas></div></section>
@@ -224,6 +244,10 @@ td{font-size:13px}
 <section class="card"><div class="ch"><div class="ct"><div class="ci">🪙</div>Статистика по активам</div><div class="badge" id="coinsCount">0 активов</div></div>
 <div class="tw"><table id="coinTable"><caption style="position:absolute;left:-9999px">Статистика по активам</caption>
 <thead><tr><th scope="col">Актив</th><th scope="col">Сделок</th><th scope="col">Winrate</th><th scope="col">Net PnL</th><th scope="col">Средняя</th><th scope="col">Лучшая</th><th scope="col">Худшая</th><th scope="col">Статус</th></tr></thead><tbody></tbody></table></div></section>
+
+<section class="card"><div class="ch"><div class="ct"><div class="ci">📆</div>По месяцам</div><div class="badge" id="monthBadge">—</div></div>
+<div class="tw"><table id="monthTable"><thead><tr><th scope="col">Месяц</th><th scope="col">Сделок</th><th scope="col">Winrate</th><th scope="col">PnL</th><th scope="col">% к депо</th></tr></thead><tbody></tbody></table></div>
+<div class="hnote" id="monthNote"></div></section>
 
 <div class="g2">
   <section class="card"><div class="ch"><div class="ct"><div class="ci">🗓️</div>PnL по дням недели</div></div><div class="cc sm"><canvas id="dayOfWeekChart" role="img" aria-label="PnL по дням недели"></canvas></div></section>
@@ -242,6 +266,8 @@ const CONFIG = {
   GID: '',                  // номер листа (gid=...), пусто = первый лист
   DEPOSIT_PER_COIN: 1000,   // USDT на каждую монету. Общий депо = число монет × это значение
   COINS_OVERRIDE: null,     // число монет вручную (например 5). null = считать по уникальным монетам в таблице
+  ROLL_WINDOW: 20,          // окно (число сделок) для скользящих метрик
+  COIN_WARN_PCT: 15,        // монета подсвечивается, если потеряла больше N% от своего депо
   REFRESH_MS: 300000,
   TIMEOUT_MS: 15000,
   MIN_TRADES: 30,           // ниже этого выводы помечаются как ненадёжные
@@ -459,7 +485,7 @@ function populateCoins() {
 
 /* ============ ФИЛЬТРЫ ============ */
 function applyFilters() {
-  depoPanel();
+  depoPanel(); coinBalances();
   let f = allTrades, cut = -Infinity; // cut = начало периода (мс)
   if (period === 'today') {
     const start = new Date(); start.setHours(0, 0, 0, 0); // календарный день по часам браузера
@@ -500,13 +526,30 @@ function analyze(trades, base) {
   const expectancy = total / n;
   const payoff = avgLoss ? avgWin / avgLoss : Infinity;
 
-  let run = 0, peak = 0, maxDD = 0, maxDDPct = 0;
+  let run = 0, peak = 0, peakTs = trades[0].timestamp, maxDD = 0, maxDDPct = 0, maxDDMs = 0;
   const equity = trades.map(t => {
-    run += t.pnlNet; peak = Math.max(peak, run);
+    run += t.pnlNet;
+    if (run > peak) { peak = run; peakTs = t.timestamp; } // peakTs: когда капитал последний раз был на максимуме
     const dd = peak - run; maxDD = Math.max(maxDD, dd);
+    if (dd > 0) maxDDMs = Math.max(maxDDMs, t.timestamp - peakTs);
     maxDDPct = Math.max(maxDDPct, dd / (base + peak) * 100);
     return {value: run, drawdown: dd};
   });
+  const curDD = equity[equity.length - 1].drawdown;
+  const curDDPct = curDD / (base + peak) * 100;
+  const curDDMs = curDD > 0 ? Math.max(0, Date.now() - peakTs) : 0; // сколько времени прошло с последнего максимума
+  const maxDDDays = maxDDMs / 864e5;
+
+  // Скользящие метрики по окну из последних W сделок (скользящая сумма, без пересчёта окна на каждом шаге)
+  const W = CONFIG.ROLL_WINDOW, roll = [];
+  if (n >= W) {
+    let sum = 0, w = 0;
+    trades.forEach((t, i) => {
+      sum += t.pnlNet; if (t.pnlNet > 0) w++;
+      if (i >= W) { const o = trades[i - W]; sum -= o.pnlNet; if (o.pnlNet > 0) w--; }
+      if (i >= W - 1) roll.push({i, wr: w / W * 100, exp: sum / W});
+    });
+  }
 
   const mean = total / n, sd = Math.sqrt(trades.reduce((s, t) => s + (t.pnlNet - mean) ** 2, 0) / n);
   const dsd = Math.sqrt(trades.reduce((s, t) => s + (t.pnlNet < 0 ? t.pnlNet ** 2 : 0), 0) / n);
@@ -534,7 +577,7 @@ function analyze(trades, base) {
     dow[t.dayOfWeek].total += t.pnlNet; dow[t.dayOfWeek].count++;
     const c = heat[t.hour][t.dayOfWeek]; c.sum += t.pnlNet; c.n++; if (t.pnlNet > 0) c.w++;
   });
-  return {n, wins: wins.length, losses: losses.length, be, winrate, total, pf, avgWin, avgLoss, expectancy, payoff, maxDD, maxDDPct, sharpe, sortino, maxW, maxL, coinStats, longs, shorts, dailyPnl, dow, heat, equity};
+  return {n, wins: wins.length, losses: losses.length, be, winrate, total, pf, avgWin, avgLoss, expectancy, payoff, maxDD, maxDDPct, maxDDDays, curDD, curDDPct, curDDMs, roll, sharpe, sortino, maxW, maxL, coinStats, longs, shorts, dailyPnl, dow, heat, equity};
 }
 
 /* ============ ОТРИСОВКА ============ */
@@ -558,6 +601,7 @@ function updateDashboard(trades, prior = 0) {
   const b = $('equityBadge'); b.className = 'badge ' + pc; b.textContent = (a.total >= 0 ? '+' : '') + usd(a.total);
   equityChart(trades, a.equity); dailyChart(a.dailyPnl); distChart(trades); lsChart(a.longs, a.shorts); wlChart(a); topChart(a.coinStats); dowChart(a.dow);
   heatmap(a.heat); coinTable(a.coinStats); insights(a);
+  riskPanel(a); rollingChart(a, trades); monthStats(trades, dep);
   $('coinsCount').textContent = `${Object.keys(a.coinStats).length} активов`;
 }
 function animateStats() {
@@ -656,6 +700,103 @@ function heatmap(heat) {
     html += '</div>';
   });
   $('heatmapContainer').innerHTML = html + '</div><div class="hleg"><span>убыток</span><i></i><span>прибыль</span></div><div class="hnote">Сумма PnL за 2 часа, $. Пустая ячейка означает, что сделок не было. Наведите курсор для деталей. ' + CONFIG.TZ_NOTE + '.</div>';
+}
+
+const pct = v => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1) + '%';
+const fmtDays = d => d < 1 ? 'меньше суток' : `${Math.floor(d)} дн.`;
+const MONTHS = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+
+/* Баланс по монетам: у каждой монеты свои выделенные DEPOSIT_PER_COIN. Считается по всем сделкам, фильтр периода не влияет. */
+function coinBalances() {
+  const card = $('coinBalCard');
+  if (!allTrades.length) { card.style.display = 'none'; return; }
+  const per = CONFIG.DEPOSIT_PER_COIN, warn = CONFIG.COIN_WARN_PCT, st = {};
+  allTrades.forEach(t => {
+    if (coinSel !== 'all' && t.coin !== coinSel) return;
+    const c = st[t.coin] ||= {n: 0, pnl: 0}; c.n++; c.pnl += t.pnlNet;
+  });
+  const list = Object.entries(st).sort((a, b) => b[1].pnl - a[1].pnl);
+  const low = list.filter(([, c]) => c.pnl / per * 100 <= -warn).length;
+  const b = $('coinBalBadge');
+  b.className = 'badge ' + (low ? 'red' : 'green');
+  b.textContent = low ? `${low} ниже −${warn}%` : `все в пределах −${warn}%`;
+  $('coinBalances').innerHTML = list.map(([coin, c]) => {
+    const r = c.pnl / per * 100, bal = per + c.pnl, isWarn = r <= -warn;
+    const w = Math.min(100, Math.max(0, bal / per * 100));
+    const col = bal >= per ? 'var(--green)' : isWarn ? 'var(--red)' : 'var(--gold)';
+    return `<div class="cbi${isWarn ? ' warn' : ''}"><div class="cbh"><span class="cbn">${esc(coin)}</span><span class="${r >= 0 ? 'pos' : 'neg'}">${pct(r)}</span></div>
+    <div class="cbv">${usd(bal)}</div><div class="ss">PnL ${usd(c.pnl)} · ${c.n} сделок</div>
+    <div class="bar"><i style="width:${w}%;background:${col}"></i></div>${isWarn ? `<div class="cbw">Ниже порога −${warn}%</div>` : ''}</div>`;
+  }).join('');
+  const extra = coinSel === 'all' ? coinCount() - list.length : 0;
+  $('coinBalNote').textContent = (extra > 0 ? `Ещё ${extra} из ${coinCount()} монет пока без сделок в таблице. ` : '') + `Полоса показывает, какая часть выделенных ${usd0(per)} осталась (максимум 100%).`;
+  card.style.display = 'block';
+}
+
+/* Текущая просадка и «свежесть» результатов: последние W сделок против среднего за период */
+function riskPanel(a) {
+  const W = CONFIG.ROLL_WINDOW, last = a.roll.length ? a.roll[a.roll.length - 1] : null;
+  const cur = a.curDD > 0.005
+    ? `<div class="stat red"><div class="sl">Текущая просадка</div><div class="sv">${usd(-a.curDD)}</div><div class="ss">${a.curDDPct.toFixed(1)}% от пика · уже ${fmtDays(a.curDDMs / 864e5)}</div></div>`
+    : `<div class="stat green"><div class="sl">Текущая просадка</div><div class="sv">Нет</div><div class="ss">Результат на максимуме за период</div></div>`;
+  const longest = `<div class="stat blue"><div class="sl">Самая долгая просадка</div><div class="sv">${a.maxDD > 0 ? fmtDays(a.maxDDDays) : '—'}</div><div class="ss">Макс. глубина ${usd(a.maxDD)} (${a.maxDDPct.toFixed(1)}%)</div></div>`;
+  const wr = last
+    ? `<div class="stat ${last.wr >= a.winrate ? 'green' : 'red'}"><div class="sl">Winrate, последние ${W}</div><div class="sv">${last.wr.toFixed(0)}%</div><div class="ss">За период ${a.winrate.toFixed(1)}%</div></div>`
+    : `<div class="stat blue"><div class="sl">Winrate, последние ${W}</div><div class="sv">—</div><div class="ss">Нужно минимум ${W} сделок (сейчас ${a.n})</div></div>`;
+  const ex = last
+    ? `<div class="stat ${last.exp >= 0 ? 'green' : 'red'}"><div class="sl">Матожидание, последние ${W}</div><div class="sv">${usd(last.exp)}</div><div class="ss">За период ${usd(a.expectancy)} на сделку</div></div>`
+    : `<div class="stat blue"><div class="sl">Матожидание, последние ${W}</div><div class="sv">—</div><div class="ss">Нужно минимум ${W} сделок (сейчас ${a.n})</div></div>`;
+  $('riskPanel').innerHTML = cur + longest + wr + ex;
+}
+
+function rollingChart(a, trades) {
+  const W = CONFIG.ROLL_WINDOW, ok = a.roll.length > 0, b = $('rollBadge');
+  $('rollWrap').style.display = ok ? '' : 'none';
+  $('rollMsg').style.display = ok ? 'none' : 'block';
+  $('rollNote').textContent = ok ? `Окно из ${W} сделок скользит по истории. Оценка на таком окне шумная: смотрите на устойчивое снижение, а не на одну точку.` : '';
+  if (!ok) {
+    if (charts.roll) { charts.roll.destroy(); delete charts.roll; }
+    $('rollMsg').textContent = `Нужно минимум ${W} сделок в выбранном периоде (сейчас ${a.n}).`;
+    b.className = 'badge'; b.textContent = 'мало данных'; return;
+  }
+  const last = a.roll[a.roll.length - 1];
+  if (last.exp < 0 && a.expectancy > 0) { b.className = 'badge red'; b.textContent = 'Ухудшение'; }
+  else if (last.exp >= a.expectancy) { b.className = 'badge green'; b.textContent = 'Не хуже среднего'; }
+  else { b.className = 'badge'; b.textContent = 'Ниже среднего'; }
+  mk('roll', 'rollChart', {type: 'line', data: {
+    labels: a.roll.map(r => trades[r.i].date.toLocaleDateString('ru-RU', {day: '2-digit', month: '2-digit', year: '2-digit'})),
+    datasets: [
+      {label: 'Матожидание, $ на сделку', data: a.roll.map(r => r.exp), borderColor: '#c8a96a', borderWidth: 2, tension: 0, pointRadius: 0, pointHoverRadius: 4, yAxisID: 'y'},
+      {label: 'Winrate, %', data: a.roll.map(r => r.wr), borderColor: '#8a9bb0', borderWidth: 1.5, borderDash: [4, 4], tension: 0, pointRadius: 0, pointHoverRadius: 4, yAxisID: 'y1'}
+    ]}, options: {responsive: true, maintainAspectRatio: false, interaction: {mode: 'index', intersect: false},
+    plugins: {legend: {labels: {usePointStyle: true, font: {size: 11}}}, tooltip: {...tip, callbacks: {
+      title: i => `Сделка №${a.roll[i[0].dataIndex].i + 1} · ${i[0].label}`,
+      label: c => c.dataset.yAxisID === 'y1' ? `Winrate: ${c.parsed.y.toFixed(1)}%` : `Матожидание: ${usd(c.parsed.y)}`}}},
+    scales: {x: {grid: {display: false}, ticks: {maxTicksLimit: 8, font: {size: 10}}},
+      y: {grid: {color: c => c.tick && c.tick.value === 0 ? 'rgba(236,232,223,.28)' : 'rgba(236,232,223,.04)'}, ticks: {callback: v => usd(v), font: {size: 10}}},
+      y1: {position: 'right', min: 0, max: 100, grid: {display: false}, ticks: {callback: v => v + '%', font: {size: 10}}}}}});
+}
+
+/* Таблица по месяцам: PnL, % к текущему депо, winrate */
+function monthStats(trades, dep) {
+  const m = {};
+  trades.forEach(t => {
+    const y = t.date.getFullYear(), mo = t.date.getMonth(), k = y * 12 + mo;
+    const c = m[k] ||= {y, mo, n: 0, w: 0, pnl: 0};
+    c.n++; c.pnl += t.pnlNet; if (t.pnlNet > 0) c.w++;
+  });
+  const rows = Object.keys(m).map(Number).sort((a, b) => b - a).map(k => m[k]);
+  const mx = Math.max(1, ...rows.map(r => Math.abs(r.pnl)));
+  const pos = rows.filter(r => r.pnl > 0).length;
+  const b = $('monthBadge'); b.className = 'badge ' + (pos * 2 >= rows.length ? 'green' : 'red'); b.textContent = `${pos} из ${rows.length} в плюсе`;
+  const tot = rows.reduce((s, r) => ({n: s.n + r.n, w: s.w + r.w, pnl: s.pnl + r.pnl}), {n: 0, w: 0, pnl: 0});
+  const cls = v => v >= 0 ? 'pos' : 'neg';
+  $('monthTable').querySelector('tbody').innerHTML = rows.map(r => {
+    const wr = r.w / r.n * 100, p = r.pnl / dep * 100, w = Math.min(100, Math.abs(r.pnl) / mx * 100);
+    return `<tr><td>${MONTHS[r.mo]} ${r.y}</td><td>${r.n}</td><td class="${wr >= 50 ? 'pos' : 'neg'}">${wr.toFixed(1)}%</td>
+    <td class="${cls(r.pnl)}">${usd(r.pnl)}<div class="bar"><i style="width:${w}%;background:${r.pnl >= 0 ? 'var(--green)' : 'var(--red)'}"></i></div></td><td class="${cls(p)}">${pct(p)}</td></tr>`;
+  }).join('') + `<tr style="font-weight:700"><td>Итого</td><td>${tot.n}</td><td>${(tot.w / tot.n * 100).toFixed(1)}%</td><td class="${cls(tot.pnl)}">${usd(tot.pnl)}</td><td class="${cls(tot.pnl)}">${pct(tot.pnl / dep * 100)}</td></tr>`;
+  $('monthNote').textContent = `Проценты считаются от депо ${usd0(dep)}. Крайние месяцы могут быть неполными: фильтр периода обрезает данные.`;
 }
 
 function coinTable(cs) {
