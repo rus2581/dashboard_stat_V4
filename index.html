@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Trading Pro Analytics</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+<!-- Для продакшена добавьте integrity="sha384-..." и crossorigin="anonymous" -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+:root{--bg:#0e1013;--bg2:#11151c;--card:rgba(22,27,34,.85);--hover:rgba(30,38,55,.6);--bd:rgba(236,232,223,.08);--bdh:rgba(200,169,106,.3);--tx:#f0f6fc;--tx2:#a1aab5;--txm:#8a877f;--blue:#c8a96a;--cyan:#c8a96a;--green:#5fb59a;--red:#d9675d;--gold:#d29922}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.5;background-image:radial-gradient(circle at 15% 15%,rgba(200,169,106,.06),transparent 40%),radial-gradient(circle at 85% 85%,rgba(200,169,106,.06),transparent 40%)}
+.container{max-width:1400px;margin:0 auto;padding:24px}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:16px;padding-bottom:20px;border-bottom:1px solid var(--bd)}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:44px;height:44px;background:linear-gradient(135deg,var(--blue),var(--cyan));border-radius:12px;display:grid;place-items:center;font-size:22px}
+h1{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.subtitle{font-size:12px;color:var(--txm);font-weight:600}
+.hc{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.live{display:flex;align-items:center;gap:8px;border:1px solid rgba(95,181,154,.25);background:rgba(95,181,154,.1);padding:7px 14px;border-radius:24px;font-size:12px;font-weight:700;color:var(--green)}
+.live.stale{color:var(--gold);border-color:rgba(210,153,34,.3);background:rgba(210,153,34,.1)}
+.live.err{color:var(--red);border-color:rgba(217,103,93,.3);background:rgba(217,103,93,.1)}
+.dot{width:8px;height:8px;background:currentColor;border-radius:50%}
+.live:not(.err):not(.stale) .dot{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(95,181,154,.6)}50%{box-shadow:0 0 0 6px rgba(95,181,154,0)}}
+.btn{padding:9px 16px;border:1px solid var(--bdh);background:var(--card);color:var(--tx);border-radius:8px;font:600 13px inherit;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:8px}
+.btn:hover{background:var(--hover);border-color:var(--blue)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.last{font:12px 'Inter',sans-serif;color:var(--txm)}
+.spin{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.filters{display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap;padding:12px 16px;background:var(--card);border:1px solid var(--bd);border-radius:12px}
+.filters label,.fl{font-size:12px;color:var(--tx2);font-weight:700}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{padding:6px 12px;background:transparent;border:1px solid var(--bd);border-radius:16px;color:var(--tx2);font:600 12px inherit;font-family:inherit;cursor:pointer;white-space:nowrap}
+.pill:hover{color:var(--tx);border-color:var(--bdh)}
+.pill[aria-pressed=true]{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#0e1013;border-color:transparent;font-weight:700}
+.sel{padding:6px 12px;background:var(--bg2);border:1px solid var(--bd);border-radius:16px;color:var(--tx);font:600 12px inherit;font-family:inherit;cursor:pointer}
+.sep{width:1px;height:20px;background:var(--bd)}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:24px}
+.stat{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;border-top:2px solid var(--blue);min-width:0}
+.stat.green{border-top-color:var(--green)}.stat.red{border-top-color:var(--red)}.stat.gold{border-top-color:var(--gold)}.stat.cyan{border-top-color:var(--cyan)}
+.sl{font-size:11px;color:var(--txm);font-weight:700;margin-bottom:4px}
+.sv{font:800 20px 'Inter',sans-serif;letter-spacing:-.5px;white-space:nowrap}
+.green>.sv,.sv.green{color:var(--green)}.red>.sv,.sv.red{color:var(--red)}.gold>.sv{color:var(--gold)}.cyan>.sv{color:var(--cyan)}.blue>.sv{color:var(--blue)}
+.ss{font:11px 'Inter',sans-serif;color:var(--tx2);margin-top:4px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px;margin-bottom:20px;min-width:0}
+.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.ct{font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px}
+.ci{width:28px;height:28px;background:linear-gradient(135deg,var(--blue),var(--cyan));border-radius:6px;display:grid;place-items:center;font-size:14px}
+.badge{padding:4px 10px;background:rgba(200,169,106,.1);border:1px solid rgba(200,169,106,.2);border-radius:12px;font:700 11px 'Inter',sans-serif;color:var(--blue)}
+.badge.green{background:rgba(95,181,154,.1);border-color:rgba(95,181,154,.2);color:var(--green)}
+.badge.red{background:rgba(217,103,93,.1);border-color:rgba(217,103,93,.2);color:var(--red)}
+.g2{display:grid;grid-template-columns:1.5fr 1fr;gap:20px;align-items:start}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.g2>*,.g3>*{min-width:0}
+.cc{position:relative;height:320px}.cc.lg{height:400px}.cc.sm{height:260px}
+.tw{overflow-x:auto;border-radius:10px;border:1px solid var(--bd)}
+table{width:100%;min-width:760px;border-collapse:collapse;font-size:13px}
+th{padding:12px 10px;text-align:left;font-size:11px;color:var(--txm);font-weight:700;background:rgba(0,0,0,.2);border-bottom:1px solid var(--bd)}
+td{padding:12px 10px;border-bottom:1px solid var(--bd);font:12px 'Inter',sans-serif}
+tbody tr:hover{background:var(--hover)}tbody tr:last-child td{border-bottom:none}
+.coin{font-family:'Inter',sans-serif;font-weight:700;display:flex;align-items:center;gap:8px;font-size:13px}
+.av{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:grid;place-items:center;font-size:11px;font-weight:800;color:#0e1013;flex-shrink:0}
+.pos{color:var(--green);font-weight:600}.neg{color:var(--red);font-weight:600}
+.tag{display:inline-block;font:700 10px 'Inter',sans-serif;padding:3px 8px;border-radius:8px;border:1px solid}
+.t-top{background:rgba(95,181,154,.15);color:var(--green);border-color:rgba(95,181,154,.25)}
+.t-bad{background:rgba(217,103,93,.15);color:var(--red);border-color:rgba(217,103,93,.25)}
+.t-std{background:rgba(200,169,106,.15);color:var(--cyan);border-color:rgba(200,169,106,.25)}
+.t-low{background:rgba(139,148,158,.15);color:var(--tx2);border-color:rgba(139,148,158,.25)}
+.bar{height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%}
+.insight{display:flex;gap:14px;padding:14px;background:rgba(200,169,106,.04);border:1px solid rgba(200,169,106,.1);border-radius:10px;margin-bottom:10px}
+.insight.success{background:rgba(95,181,154,.04);border-color:rgba(95,181,154,.15)}
+.insight.warning{background:rgba(210,153,34,.04);border-color:rgba(210,153,34,.15)}
+.insight.danger{background:rgba(217,103,93,.04);border-color:rgba(217,103,93,.15)}
+.ii{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.06);display:grid;place-items:center;flex-shrink:0}
+.it{font-weight:700;font-size:13px;margin-bottom:3px}.ix{font-size:12px;color:var(--tx2);line-height:1.4}
+/* Heatmap */
+.hm{display:grid;grid-template-columns:56px repeat(7,minmax(0,1fr));gap:3px}
+.hl{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--txm)}
+.hc2{height:26px;display:flex;align-items:center;justify-content:center;border-radius:4px;font:600 10px 'Inter',sans-serif;color:#fff;cursor:default;overflow:hidden}
+.hc2:hover,.hc2:focus-visible{outline:2px solid var(--blue);position:relative;z-index:2}
+.hleg{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:11px;color:var(--txm)}
+.hleg i{flex:1;max-width:180px;height:8px;border-radius:4px;background:linear-gradient(90deg,rgba(217,103,93,.9),rgba(217,103,93,.15),rgba(200,169,106,.12),rgba(95,181,154,.15),rgba(95,181,154,.9))}
+.hnote{font-size:11px;color:var(--txm);margin-top:8px}
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .4s}
+#loading.off{opacity:0;pointer-events:none}
+.loader{width:50px;height:50px;border:3px solid var(--bd);border-top-color:var(--blue);border-right-color:var(--cyan);border-radius:50%;animation:spin 1s linear infinite}
+.lt{margin-top:16px;color:var(--tx2);font-size:13px;font-weight:600}
+#errbox{display:none;margin-bottom:20px;padding:16px;border:1px solid rgba(217,103,93,.4);background:rgba(217,103,93,.08);border-radius:12px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#empty{display:none;text-align:center;padding:60px 20px;color:var(--tx2)}
+.toast{position:fixed;top:24px;right:24px;padding:12px 18px;background:#161b22;border:1px solid var(--bdh);border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.6);font-size:13px;font-weight:600;transform:translateX(calc(100% + 24px));transition:transform .3s;z-index:10000;max-width:calc(100vw - 32px)}
+.toast.show{transform:none}
+@media(max-width:1200px){.stats{grid-template-columns:repeat(3,1fr)}.g3{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.container{padding:16px}.stats{grid-template-columns:repeat(2,1fr);gap:10px}.g2,.g3{grid-template-columns:1fr}.cc{height:260px}.cc.lg{height:300px}.sv{font-size:18px}}
+@media(max-width:600px){.hm{grid-template-columns:44px repeat(7,minmax(0,1fr));gap:2px}.hc2{font-size:9px;height:24px}.toast{left:16px;right:16px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ===== PREMIUM THEME ===== */
+:root{--bg:#0e1013;--bg2:#15181d;--card:#13161a;--hover:#191d23;--bd:rgba(236,232,223,.09);--bdh:rgba(200,169,106,.4);--tx:#ece8df;--tx2:#a8a49b;--txm:#8a877f;--blue:#c8a96a;--cyan:#c8a96a;--gold:#c8a96a;--green:#5fb59a;--red:#d9675d;--serif:'Fraunces',Georgia,serif}
+body{background:var(--bg);background-image:none;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+.container{max-width:1320px;padding:32px 32px 64px}
+.header{border-bottom:1px solid var(--bd);padding-bottom:24px;margin-bottom:32px}
+h1{font:600 26px var(--serif);letter-spacing:-.01em}
+.subtitle{color:var(--txm);font-size:13px}
+.logo{background:none;border:1px solid var(--blue);border-radius:50%;font-size:0}
+.logo::after{content:'T';font:600 22px var(--serif);color:var(--blue)}
+.live{background:none;border-color:var(--bd);font-weight:600}
+.btn{background:none;border-radius:6px;border-color:var(--bd)}
+.btn:hover{background:var(--hover);border-color:var(--blue);box-shadow:none;transform:none}
+.filters{background:none;border:none;border-bottom:1px solid var(--bd);border-radius:0;padding:0 0 16px;margin-bottom:32px}
+.pill{border:none;border-radius:0;padding:6px 10px;border-bottom:2px solid transparent;color:var(--txm)}
+.pill:hover{color:var(--tx)}
+.pill[aria-pressed=true]{background:none;color:var(--tx);border-bottom-color:var(--blue)}
+.sel{border-radius:6px;background:var(--bg2)}
+/* Сводка: одна полоса вместо шести карточек, главный элемент - PnL */
+.stats{gap:1px;background:var(--bd);border:1px solid var(--bd);border-radius:8px;overflow:hidden;grid-template-columns:1.7fr repeat(5,1fr);margin-bottom:32px}
+.stat{background:var(--bg);border:none;border-radius:0;padding:22px 20px}
+.sl{font-size:13px;font-weight:500;color:var(--txm)}
+.sv{font:500 22px 'Inter',sans-serif;letter-spacing:-.01em}
+.stat:first-child{padding:26px 28px}
+.stat:first-child .sv{font:500 clamp(36px,4.4vw,56px)/1.05 var(--serif);letter-spacing:-.02em}
+.stat:first-child .sl{font-size:14px}
+.ss{color:var(--txm);font-size:12px}
+.card{background:var(--card);border-radius:8px;padding:24px;backdrop-filter:none}
+.card:hover{border-color:var(--bd)}
+.ct{font:600 18px var(--serif);letter-spacing:-.005em}
+.ci{display:none}
+.badge{background:none;border-radius:4px;font-weight:600}
+.badge.green{background:none}.badge.red{background:none}
+.tw{border-radius:6px}
+th{font-weight:600;font-size:12px;background:none;color:var(--txm)}
+td{font-size:13px}
+.av{background:none;border:1px solid var(--bdh);color:var(--blue);border-radius:50%}
+.tag{border-radius:4px;font-weight:600;background:none!important}
+.insight,.insight.success,.insight.warning,.insight.danger{background:none;border:none;border-left:2px solid var(--bd);border-radius:0;padding:4px 0 4px 16px;margin-bottom:18px}
+.insight.success{border-left-color:var(--green)}.insight.warning{border-left-color:var(--gold)}.insight.danger{border-left-color:var(--red)}
+.ii{display:none}
+.it{font-size:14px}.ix{font-size:13px}
+.hc2{border-radius:2px}
+.hleg i{background:linear-gradient(90deg,rgba(217,103,93,.9),rgba(217,103,93,.15),rgba(236,232,223,.06),rgba(95,181,154,.15),rgba(95,181,154,.9))}
+.toast{background:var(--bg2);border-radius:6px}
+
+/* Панель депозита */
+.depo{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bd);border:1px solid var(--bd);border-radius:8px;overflow:hidden;margin-bottom:24px}
+.depo:empty{display:none}
+.depo .stat:first-child{padding:22px 20px}
+.depo .stat:first-child .sv{font:500 22px 'Inter',sans-serif;letter-spacing:-.01em}
+.depo .stat:first-child .sl{font-size:13px}
+.depo .stat{border-top:none}
+.depo .bar{height:6px;margin-top:10px}
+.depo .note{grid-column:1/-1;background:var(--bg);padding:10px 20px;font-size:12px;color:var(--txm);border-top:1px solid var(--bd)}
+
+@media(max-width:1200px){.stats{grid-template-columns:repeat(3,1fr)}.stat:first-child{grid-column:1/-1}}
+@media(max-width:900px){.container{padding:20px 16px 48px}.stats{grid-template-columns:repeat(2,1fr)}.depo{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div id="loading" role="status"><div class="loader"></div><div class="lt">Загружаю данные…</div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<main class="container" id="dashboard">
+<header class="header">
+  <div class="brand"><div class="logo" aria-hidden="true">📊</div><div><h1>Trading Pro Analytics</h1><div class="subtitle">Дашборд трейдера</div></div></div>
+  <div class="hc">
+    <div class="live" id="status"><span class="dot"></span><span id="statusText">Подключение…</span></div>
+    <span class="last" id="lastUpdated"></span>
+    <button class="btn" id="refreshBtn" type="button">Обновить</button>
+  </div>
+</header>
+
+<div id="errbox" role="alert"><span id="errText"></span><button class="btn" type="button" id="retryBtn">Повторить</button></div>
+
+<section class="filters" aria-label="Фильтры">
+  <span class="fl" id="pl">Период:</span>
+  <div class="pills" id="periodFilter" role="group" aria-labelledby="pl">
+    <button class="pill" data-period="today" aria-pressed="false">Сегодня</button>
+    <button class="pill" data-period="7" aria-pressed="false">7Д</button>
+    <button class="pill" data-period="30" aria-pressed="false">30Д</button>
+    <button class="pill" data-period="90" aria-pressed="true">3М</button>
+    <button class="pill" data-period="180" aria-pressed="false">6М</button>
+    <button class="pill" data-period="365" aria-pressed="false">1Г</button>
+    <button class="pill" data-period="all" aria-pressed="false">Всё</button>
+  </div>
+  <div class="sep"></div>
+  <label for="directionFilter">Направление:</label>
+  <select class="sel" id="directionFilter"><option value="all">Все</option><option value="long">Только лонги</option><option value="short">Только шорты</option></select>
+  <div class="sep"></div>
+  <label for="coinFilter">Актив:</label>
+  <select class="sel" id="coinFilter"><option value="all">Все активы</option></select>
+</section>
+
+<section class="depo" id="depoPanel" aria-label="Депозит"></section>
+
+<div id="empty"><h2>Нет сделок за выбранный период</h2><p>Расширьте период или сбросьте фильтры направления и актива.</p></div>
+
+<div id="content">
+<section class="stats" id="statsGrid" aria-label="Ключевые метрики"></section>
+
+<section class="card"><div class="ch"><div class="ct"><div class="ci">📈</div>Кривая капитала</div><div class="badge" id="equityBadge">—</div></div>
+<div class="cc lg"><canvas id="equityChart" role="img" aria-label="График кривой капитала и просадки"></canvas></div></section>
+
+<div class="g2">
+  <section class="card"><div class="ch"><div class="ct"><div class="ci">📊</div>Дневной PnL</div></div><div class="cc"><canvas id="dailyChart" role="img" aria-label="Дневной PnL"></canvas></div></section>
+  <section class="card"><div class="ch"><div class="ct"><div class="ci">🎯</div>Распределение PnL по сделкам</div></div><div class="cc"><canvas id="distributionChart" role="img" aria-label="Гистограмма PnL"></canvas></div></section>
+</div>
+
+<div class="g3">
+  <section class="card"><div class="ch"><div class="ct"><div class="ci">⚖️</div>Лонги и шорты</div></div><div class="cc sm"><canvas id="longShortChart" role="img" aria-label="PnL по направлениям"></canvas></div></section>
+  <section class="card"><div class="ch"><div class="ct"><div class="ci">🏆</div>Победы, убытки, ноль</div></div><div class="cc sm"><canvas id="winLossChart" role="img" aria-label="Соотношение результатов"></canvas></div></section>
+  <section class="card"><div class="ch"><div class="ct"><div class="ci">🔥</div>Топ активов по PnL</div></div><div class="cc sm"><canvas id="topCoinsChart" role="img" aria-label="Топ активов"></canvas></div></section>
+</div>
+
+<section class="card"><div class="ch"><div class="ct"><div class="ci">🪙</div>Статистика по активам</div><div class="badge" id="coinsCount">0 активов</div></div>
+<div class="tw"><table id="coinTable"><caption class="sr" style="position:absolute;left:-9999px">Статистика по активам</caption>
+<thead><tr><th scope="col">Актив</th><th scope="col">Сделок</th><th scope="col">Winrate</th><th scope="col">Net PnL</th><th scope="col">Средняя</th><th scope="col">Лучшая</th><th scope="col">Худшая</th><th scope="col">Статус</th></tr></thead><tbody></tbody></table></div></section>
+
+<div class="g2">
+  <section class="card"><div class="ch"><div class="ct"><div class="ci">🗓️</div>PnL по дням недели</div></div><div class="cc sm"><canvas id="dayOfWeekChart" role="img" aria-label="PnL по дням недели"></canvas></div></section>
+  <section class="card"><div class="ch"><div class="ct"><div class="ci">⏰</div>Тепловая карта: время суток и день недели</div></div>
+    <div id="heatmapContainer"></div></section>
+</div>
+
+<section class="card"><div class="ch"><div class="ct"><div class="ci">🧠</div>Выводы</div></div><div id="insightsContainer"></div></section>
+</div>
+</main>
+
+<script>
+/* ============ НАСТРОЙКИ ============ */
+const CONFIG = {
+  SHEET_ID: '1pS1Mx71tjvO__5HiQtF-MbudSyUG07LBOs_RkowDC9I',
+  GID: '',                  // номер листа (gid=...), пусто = первый лист
+  DEPOSIT_PER_COIN: 1000,   // USDT на каждую монету. Общий депо = число монет × это значение
+  ACTIVE_HOURS: 24,         // монета считается «в сделках», если по ней была сделка за последние N часов
+  REFRESH_MS: 300000,
+  TIMEOUT_MS: 15000,
+  MIN_TRADES: 30,           // ниже этого выводы помечаются как ненадёжные
+  MIN_GROUP: 10,            // минимум сделок для выводов по активу, дню, стороне
+  TZ_NOTE: 'Время — как в таблице',
+  // Ключевые слова заголовков колонок (нижний регистр). Первая найденная по порядку побеждает.
+  COLS: {
+    pnl:  ['pnl $', 'net pnl', 'pnl net', 'чистый pnl', 'pnl'],
+    coin: ['монет', 'coin', 'symbol', 'тикер', 'актив'],
+    dir:  ['направлен', 'direction', 'side'],
+    date: ['дата закрыт', 'close time', 'closed', 'дата', 'date', 'время']
+  }
+};
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:csv${CONFIG.GID ? '&gid=' + CONFIG.GID : ''}`;
+const DAYS = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'], ORDER = [1,2,3,4,5,6,0];
+
+let charts = {}, allTrades = [], period = 90, direction = 'all', coinSel = 'all';
+let loading = false, lastOk = null, animId = 0, toastT;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf = new Intl.NumberFormat('ru-RU', {minimumFractionDigits:2, maximumFractionDigits:2});
+const usd = v => (v < 0 ? '−$' : '$') + nf.format(Math.abs(v));
+const usd0 = v => (v < 0 ? '−$' : '$') + Math.round(Math.abs(v)).toLocaleString('ru-RU');
+const dayKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const isLong = t => /ЛОНГ|LONG|BUY/i.test(t.direction);
+const isShort = t => /ШОРТ|SHORT|SELL/i.test(t.direction);
+
+/* ============ ДЕПОЗИТ ============ */
+// Число монет берём по всем сделкам в таблице (не по фильтру периода), чтобы депо не «прыгал».
+// Если выбрана одна монета, депо = 1 × DEPOSIT_PER_COIN.
+function coinCount() {
+  return coinSel === 'all' ? new Set(allTrades.map(t => t.coin)).size : 1;
+}
+function getDeposit() { return coinCount() * CONFIG.DEPOSIT_PER_COIN; }
+
+// Панель: общий депо, текущий баланс, сколько задействовано в сделках, сколько свободно.
+// «В сделках» оценивается по таблице: монета считается активной, если по ней была сделка за последние ACTIVE_HOURS часов.
+function depoPanel() {
+  const el = $('depoPanel');
+  if (!allTrades.length) { el.innerHTML = ''; return; }
+  const per = CONFIG.DEPOSIT_PER_COIN;
+  const scope = coinSel === 'all' ? allTrades : allTrades.filter(t => t.coin === coinSel);
+  const n = coinCount(), dep = n * per;
+  const pnl = scope.reduce((s, t) => s + t.pnlNet, 0), bal = dep + pnl;
+  const last = {};
+  scope.forEach(t => { last[t.coin] = Math.max(last[t.coin] || 0, t.timestamp); });
+  const lim = Date.now() - CONFIG.ACTIVE_HOURS * 36e5;
+  const act = Object.values(last).filter(ts => ts >= lim).length;
+  const used = act * per, free = dep - used, usedPct = dep ? used / dep * 100 : 0;
+  const pc = pnl >= 0 ? 'green' : 'red';
+  el.innerHTML = `
+  <div class="stat blue"><div class="sl">Общий депозит</div><div class="sv">${usd0(dep)}</div><div class="ss">${n} ${n === 1 ? 'монета' : 'монет'} × ${usd0(per)}</div></div>
+  <div class="stat ${pc}"><div class="sl">Текущий баланс</div><div class="sv">${usd(bal)}</div><div class="ss">PnL за всё время ${pnl >= 0 ? '+' : ''}${usd(pnl)} (${(pnl / dep * 100).toFixed(1)}%)</div></div>
+  <div class="stat gold"><div class="sl">В сделках</div><div class="sv">${usd0(used)}</div><div class="ss">${act} из ${n} монет · ${usedPct.toFixed(0)}% депо</div><div class="bar"><i style="width:${usedPct}%;background:var(--blue)"></i></div></div>
+  <div class="stat cyan"><div class="sl">Свободно</div><div class="sv">${usd0(free)}</div><div class="ss">${n - act} ${(n - act) === 1 ? 'монета' : 'монет'} без сделок</div></div>
+  <div class="note">«В сделках» считается по таблице: монета задействована, если по ней была сделка за последние ${CONFIG.ACTIVE_HOURS} ч. Реальные открытые позиции таблица не показывает.</div>`;
+}
+
+/* ============ ПАРСИНГ ============ */
+function parseNum(v) {
+  if (v == null) return NaN;
+  let s = String(v).trim().replace(/[\s\u00A0$€]/g, '').replace(/[−–—]/g, '-');
+  if (!s) return NaN;
+  let neg = false;
+  if (/^\(.*\)$/.test(s)) { neg = true; s = s.slice(1, -1); }
+  const lc = s.lastIndexOf(','), ld = s.lastIndexOf('.');
+  if (lc > -1 && ld > -1) s = lc > ld ? s.replace(/\./g, '').replace(',', '.') : s.replace(/,/g, '');
+  else if (lc > -1) s = /^-?\d{1,3}(,\d{3})+$/.test(s) ? s.replace(/,/g, '') : s.replace(',', '.');
+  const n = parseFloat(s.replace(/[^0-9.\-]/g, ''));
+  return isNaN(n) ? NaN : (neg ? -n : n);
+}
+function parseDate(s) {
+  s = String(s || '').trim();
+  if (!s) return null;
+  let m = s.match(/^(\d{1,2})[./](\d{1,2})[./](\d{2,4})(?:[ T]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+  if (m) {
+    let [, d, mo, y, h = 0, mi = 0, sec = 0] = m; y = +y < 100 ? 2000 + +y : +y;
+    const dt = new Date(y, mo - 1, d, h, mi, sec);
+    return isNaN(dt) ? null : dt;
+  }
+  m = s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?/);
+  if (m) return new Date(+m[1], m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0));
+  const f = new Date(s); return isNaN(f) ? null : f;
+}
+function findCol(headers, keys) {
+  for (const k of keys) { const i = headers.findIndex(h => h.toLowerCase().includes(k)); if (i > -1) return i; }
+  return -1;
+}
+function parseCSV(text) {
+  text = text.replace(/^\uFEFF/, '');
+  if (/^\s*<(!doctype|html)/i.test(text)) throw new Error('Google вернул страницу входа. Откройте доступ к таблице: «Все, у кого есть ссылка» → «Читатель».');
+  const res = Papa.parse(text, {skipEmptyLines: true});
+  const rows = res.data;
+  if (rows.length < 2) return {trades: [], skipped: 0};
+  const h = rows[0].map(x => String(x).trim());
+  const idx = {}, missing = [];
+  for (const k in CONFIG.COLS) { idx[k] = findCol(h, CONFIG.COLS[k]); if (idx[k] < 0) missing.push(k); }
+  if (missing.length) throw new Error(`Не найдены колонки: ${missing.join(', ')}. Заголовки в таблице: ${h.join(' | ')}`);
+  const trades = []; let skipped = 0;
+  for (let i = 1; i < rows.length; i++) {
+    const r = rows[i];
+    const pnl = parseNum(r[idx.pnl]), date = parseDate(r[idx.date]), coin = String(r[idx.coin] || '').trim();
+    if (isNaN(pnl) || !date || !coin) { skipped++; continue; }
+    trades.push({date, coin, direction: String(r[idx.dir] || '').trim(), pnlNet: pnl, hour: date.getHours(), dayOfWeek: date.getDay(), timestamp: date.getTime()});
+  }
+  return {trades: trades.sort((a, b) => a.timestamp - b.timestamp), skipped};
+}
+
+/* ============ UI-утилиты ============ */
+function toast(msg, type) {
+  const t = $('toast'); t.textContent = msg;
+  t.style.borderColor = type === 'success' ? 'var(--green)' : type === 'error' ? 'var(--red)' : 'var(--bdh)';
+  t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3500);
+}
+function setStatus(kind, text) { const s = $('status'); s.className = 'live' + (kind ? ' ' + kind : ''); $('statusText').textContent = text; }
+function showError(msg) { const b = $('errbox'); $('errText').textContent = msg; b.style.display = 'flex'; }
+function hideError() { $('errbox').style.display = 'none'; }
+function setBtn(busy) {
+  const b = $('refreshBtn'); b.disabled = busy;
+  b.innerHTML = `<svg class="${busy ? 'spin' : ''}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>${busy ? 'Загрузка…' : 'Обновить'}`;
+}
+function tick() {
+  if (!lastOk) return;
+  const min = Math.floor((Date.now() - lastOk) / 60000);
+  $('lastUpdated').textContent = 'Обновлено ' + lastOk.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+  if (!$('status').classList.contains('err')) setStatus(min >= 10 ? 'stale' : '', min >= 10 ? `Данные ${min} мин назад` : 'Данные актуальны');
+  depoPanel(); // «в сделках» зависит от текущего времени
+}
+
+/* ============ ЗАГРУЗКА ============ */
+async function loadData() {
+  if (loading) return; loading = true; setBtn(true);
+  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), CONFIG.TIMEOUT_MS);
+  try {
+    if (typeof Chart === 'undefined' || typeof Papa === 'undefined') throw new Error('Не загрузились библиотеки Chart.js или PapaParse. Проверьте интернет и блокировщики.');
+    Chart.defaults.font.family = "'Inter',sans-serif"; Chart.defaults.color = '#8a877f'; Chart.defaults.borderColor = 'rgba(236,232,223,.06)';
+    const r = await fetch(SHEET_URL, {cache: 'no-store', signal: ctl.signal});
+    if (!r.ok) throw new Error(r.status === 401 || r.status === 403 ? 'Доступ запрещён. Откройте таблицу: «Все, у кого есть ссылка» → «Читатель».' : `Ошибка сети: ${r.status}`);
+    const {trades, skipped} = parseCSV(await r.text());
+    if (!trades.length) throw new Error('В таблице нет валидных сделок.');
+    allTrades = trades; lastOk = new Date(); hideError(); populateCoins(); applyFilters(); tick();
+    if (skipped) toast(`Загружено ${trades.length}. Пропущено строк с ошибками: ${skipped}`, 'info');
+  } catch (e) {
+    const msg = e.name === 'AbortError' ? 'Превышено время ожидания ответа Google.' : e.message;
+    console.error(e); showError(msg); setStatus('err', 'Нет связи');
+    if (!allTrades.length) { $('content').style.display = 'none'; $('depoPanel').innerHTML = ''; }
+  } finally {
+    clearTimeout(to); loading = false; setBtn(false); $('loading').classList.add('off');
+  }
+}
+function populateCoins() {
+  const coins = [...new Set(allTrades.map(t => t.coin))].sort(), sel = $('coinFilter');
+  sel.innerHTML = '<option value="all">Все активы</option>' + coins.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  if (coins.includes(coinSel)) sel.value = coinSel; else { sel.value = 'all'; coinSel = 'all'; }
+}
+
+/* ============ ФИЛЬТРЫ ============ */
+function applyFilters() {
+  depoPanel();
+  let f = allTrades;
+  if (period === 'today') {
+    const start = new Date(); start.setHours(0, 0, 0, 0); // календарный день по часам браузера
+    f = f.filter(t => t.timestamp >= start.getTime());
+  } else if (period !== 'all' && allTrades.length) {
+    const end = allTrades[allTrades.length - 1].timestamp; // от последней сделки, не от «сейчас»
+    f = f.filter(t => end - t.timestamp <= period * 864e5);
+  }
+  if (direction === 'long') f = f.filter(isLong);
+  if (direction === 'short') f = f.filter(isShort);
+  if (coinSel !== 'all') f = f.filter(t => t.coin === coinSel);
+  const empty = !f.length;
+  $('empty').style.display = empty ? 'block' : 'none';
+  $('content').style.display = empty ? 'none' : 'block';
+  if (!empty) updateDashboard(f);
+}
+
+/* ============ РАСЧЁТЫ ============ */
+function analyze(trades, deposit) {
+  const n = trades.length;
+  const wins = trades.filter(t => t.pnlNet > 0), losses = trades.filter(t => t.pnlNet < 0), be = n - wins.length - losses.length;
+  const winrate = wins.length / n * 100;
+  const total = trades.reduce((s, t) => s + t.pnlNet, 0);
+  const gp = wins.reduce((s, t) => s + t.pnlNet, 0), gl = Math.abs(losses.reduce((s, t) => s + t.pnlNet, 0));
+  const pf = gl === 0 ? (gp > 0 ? Infinity : 0) : gp / gl;
+  const avgWin = wins.length ? gp / wins.length : 0, avgLoss = losses.length ? gl / losses.length : 0;
+  const expectancy = total / n;
+  const payoff = avgLoss ? avgWin / avgLoss : Infinity;
+
+  let run = 0, peak = 0, maxDD = 0, maxDDPct = 0;
+  const equity = trades.map(t => {
+    run += t.pnlNet; peak = Math.max(peak, run);
+    const dd = peak - run; maxDD = Math.max(maxDD, dd);
+    maxDDPct = Math.max(maxDDPct, dd / (deposit + peak) * 100);
+    return {value: run, drawdown: dd};
+  });
+
+  const mean = total / n, sd = Math.sqrt(trades.reduce((s, t) => s + (t.pnlNet - mean) ** 2, 0) / n);
+  const dsd = Math.sqrt(trades.reduce((s, t) => s + (t.pnlNet < 0 ? t.pnlNet ** 2 : 0), 0) / n);
+  const sharpe = sd ? mean / sd : 0, sortino = dsd ? mean / dsd : 0;
+
+  let maxW = 0, maxL = 0, cw = 0, cl = 0;
+  trades.forEach(t => {
+    if (t.pnlNet > 0) { cw++; cl = 0; maxW = Math.max(maxW, cw); }
+    else if (t.pnlNet < 0) { cl++; cw = 0; maxL = Math.max(maxL, cl); }
+  });
+
+  const coinStats = {};
+  trades.forEach(t => {
+    const c = coinStats[t.coin] ||= {total: 0, wins: 0, pnl: 0, best: -Infinity, worst: Infinity};
+    c.total++; c.pnl += t.pnlNet; if (t.pnlNet > 0) c.wins++;
+    c.best = Math.max(c.best, t.pnlNet); c.worst = Math.min(c.worst, t.pnlNet);
+  });
+
+  const longs = trades.filter(isLong), shorts = trades.filter(isShort);
+  const dailyPnl = {}; trades.forEach(t => { const k = dayKey(t.date); dailyPnl[k] = (dailyPnl[k] || 0) + t.pnlNet; });
+
+  const dow = DAYS.map(() => ({total: 0, count: 0}));
+  const heat = Array.from({length: 24}, () => Array.from({length: 7}, () => ({sum: 0, n: 0, w: 0})));
+  trades.forEach(t => {
+    dow[t.dayOfWeek].total += t.pnlNet; dow[t.dayOfWeek].count++;
+    const c = heat[t.hour][t.dayOfWeek]; c.sum += t.pnlNet; c.n++; if (t.pnlNet > 0) c.w++;
+  });
+  return {n, wins: wins.length, losses: losses.length, be, winrate, total, pf, avgWin, avgLoss, expectancy, payoff, maxDD, maxDDPct, sharpe, sortino, maxW, maxL, coinStats, longs, shorts, dailyPnl, dow, heat, equity};
+}
+
+/* ============ ОТРИСОВКА ============ */
+const tip = {backgroundColor: 'rgba(9,12,16,.95)', borderColor: 'rgba(200,169,106,.3)', borderWidth: 1, padding: 10};
+const grid = {color: 'rgba(236,232,223,.04)'};
+function mk(key, id, cfg) { if (charts[key]) charts[key].destroy(); charts[key] = new Chart($(id), cfg); }
+const fmtN = v => Number.isFinite(v) ? nf.format(v) : '∞';
+
+function updateDashboard(trades) {
+  const dep = getDeposit(), a = analyze(trades, dep);
+  const pc = a.total >= 0 ? 'green' : 'red', wc = a.winrate >= 50 ? 'green' : 'red', fc = a.pf >= 1.5 ? 'green' : a.pf >= 1 ? 'gold' : 'red';
+  $('statsGrid').innerHTML = `
+  <div class="stat ${pc}"><div class="sl">Суммарный PnL</div><div class="sv" data-v="${a.total}" data-f="usd">${usd(a.total)}</div><div class="ss">${a.n} сделок · ${(a.total / dep * 100).toFixed(1)}% к депо ${usd0(dep)}</div></div>
+  <div class="stat ${wc}"><div class="sl">Winrate</div><div class="sv" data-v="${a.winrate}" data-f="pct">${a.winrate.toFixed(1)}%</div><div class="ss">${a.wins} побед · ${a.losses} убытков${a.be ? ' · ' + a.be + ' в ноль' : ''}</div></div>
+  <div class="stat ${fc}"><div class="sl">Profit Factor</div><div class="sv">${fmtN(a.pf)}</div><div class="ss">Матожидание ${usd(a.expectancy)}</div></div>
+  <div class="stat red"><div class="sl">Макс. просадка</div><div class="sv" data-v="${a.maxDD}" data-f="usd">${usd(a.maxDD)}</div><div class="ss">${a.maxDDPct.toFixed(1)}% от депо ${usd0(dep)}</div></div>
+  <div class="stat blue"><div class="sl">Sharpe (на сделку)</div><div class="sv">${nf.format(a.sharpe)}</div><div class="ss">Sortino ${nf.format(a.sortino)} · Payoff ${fmtN(a.payoff)}</div></div>
+  <div class="stat cyan"><div class="sl">Серии</div><div class="sv">${a.maxW} побед</div><div class="ss">Макс. убытков подряд: ${a.maxL}</div></div>`;
+  animateStats();
+
+  const b = $('equityBadge'); b.className = 'badge ' + pc; b.textContent = (a.total >= 0 ? '+' : '') + usd(a.total);
+  equityChart(trades, a.equity); dailyChart(a.dailyPnl); distChart(trades); lsChart(a.longs, a.shorts); wlChart(a); topChart(a.coinStats); dowChart(a.dow);
+  heatmap(a.heat); coinTable(a.coinStats); insights(a);
+  $('coinsCount').textContent = `${Object.keys(a.coinStats).length} активов`;
+}
+function animateStats() {
+  if (matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  const id = ++animId, t0 = performance.now();
+  const els = [...document.querySelectorAll('[data-v]')];
+  const step = now => {
+    if (id !== animId) return; // отменяет старую анимацию
+    const p = Math.min((now - t0) / 800, 1), e = 1 - (1 - p) ** 3;
+    els.forEach(el => { const v = +el.dataset.v * e; el.textContent = el.dataset.f === 'pct' ? v.toFixed(1) + '%' : usd(v); });
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+function equityChart(trades, eq) {
+  mk('equity', 'equityChart', {type: 'line', data: {
+    labels: trades.map(t => t.date.toLocaleDateString('ru-RU', {day: '2-digit', month: '2-digit', year: '2-digit'})),
+    datasets: [
+      {label: 'Капитал', data: eq.map(e => e.value), borderColor: '#c8a96a', borderWidth: 2.5, fill: true, tension: 0, pointRadius: 0, pointHoverRadius: 5,
+       backgroundColor: c => { const g = c.chart.ctx.createLinearGradient(0, 0, 0, c.chart.height || 400); g.addColorStop(0, 'rgba(200,169,106,.25)'); g.addColorStop(1, 'rgba(200,169,106,0)'); return g; }},
+      {label: 'Просадка', data: eq.map(e => -e.drawdown), borderColor: 'rgba(217,103,93,.6)', backgroundColor: 'rgba(217,103,93,.08)', fill: true, tension: 0, pointRadius: 0, borderWidth: 1.5, borderDash: [4, 4]}
+    ]}, options: {responsive: true, maintainAspectRatio: false, interaction: {mode: 'index', intersect: false},
+    plugins: {legend: {labels: {usePointStyle: true, font: {size: 11}}}, tooltip: {...tip, callbacks: {title: i => `Сделка №${i[0].dataIndex + 1} · ${i[0].label}`, label: c => `${c.dataset.label}: ${usd(c.parsed.y)}`}}},
+    scales: {x: {grid: {display: false}, ticks: {maxTicksLimit: 8, font: {size: 10}}}, y: {grid, ticks: {callback: v => usd0(v), font: {size: 10}}}}}});
+}
+function dailyChart(d) {
+  const keys = Object.keys(d).sort(), v = keys.map(k => d[k]);
+  mk('daily', 'dailyChart', {type: 'bar', data: {labels: keys.map(k => { const [y, m, dd] = k.split('-'); return `${dd}.${m}`; }),
+    datasets: [{data: v, backgroundColor: v.map(x => x >= 0 ? 'rgba(95,181,154,.6)' : 'rgba(217,103,93,.6)'), borderRadius: 4}]},
+    options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {label: c => usd(c.parsed.y)}}},
+    scales: {x: {grid: {display: false}, ticks: {maxTicksLimit: 8, font: {size: 10}, maxRotation: 0}}, y: {grid, ticks: {callback: x => usd0(x), font: {size: 10}}}}}});
+}
+function distChart(trades) {
+  const p = trades.map(t => t.pnlNet), min = Math.min(...p), max = Math.max(...p);
+  const bins = 12, span = Math.max(Math.abs(min), Math.abs(max)) || 1;
+  // бины симметричны относительно нуля: 0 всегда граница бина
+  const size = (2 * span) / bins, lo0 = -span;
+  const bk = Array(bins).fill(0);
+  p.forEach(x => bk[Math.min(bins - 1, Math.floor((x - lo0) / size))]++);
+  const mid = i => lo0 + (i + .5) * size;
+  mk('dist', 'distributionChart', {type: 'bar', data: {labels: bk.map((_, i) => `${usd0(lo0 + i * size)}…${usd0(lo0 + (i + 1) * size)}`),
+    datasets: [{data: bk, backgroundColor: bk.map((_, i) => mid(i) >= 0 ? 'rgba(95,181,154,.6)' : 'rgba(217,103,93,.6)'), borderRadius: 4}]},
+    options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {label: c => `${c.parsed.y} сделок`}}},
+    scales: {x: {grid: {display: false}, ticks: {font: {size: 9}, maxRotation: 45, autoSkip: true, maxTicksLimit: 6}}, y: {grid, ticks: {precision: 0, font: {size: 10}}}}}});
+}
+function lsChart(L, S) {
+  const st = a => ({pnl: a.reduce((s, t) => s + t.pnlNet, 0), wr: a.length ? a.filter(t => t.pnlNet > 0).length / a.length * 100 : 0, n: a.length});
+  const l = st(L), s = st(S), vals = [l.pnl, s.pnl];
+  mk('ls', 'longShortChart', {type: 'bar', data: {labels: [`Лонги (${l.n})`, `Шорты (${s.n})`],
+    datasets: [{data: vals, backgroundColor: vals.map(v => v >= 0 ? 'rgba(95,181,154,.6)' : 'rgba(217,103,93,.6)'), borderRadius: 6}]},
+    options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {label: c => `PnL: ${usd(c.parsed.y)} · WR ${[l, s][c.dataIndex].wr.toFixed(0)}%`}}},
+    scales: {x: {grid: {display: false}}, y: {grid, ticks: {callback: v => usd0(v), font: {size: 10}}}}}});
+}
+function wlChart(a) {
+  mk('wl', 'winLossChart', {type: 'doughnut', data: {labels: [`Победы (${a.wins})`, `Убытки (${a.losses})`, `В ноль (${a.be})`],
+    datasets: [{data: [a.wins, a.losses, a.be], backgroundColor: ['#5fb59a', '#d9675d', '#6e7681'], borderWidth: 0}]},
+    options: {responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: {legend: {position: 'bottom', labels: {usePointStyle: true, font: {size: 11}}}}}});
+}
+function topChart(cs) {
+  const s = Object.entries(cs).sort((a, b) => b[1].pnl - a[1].pnl).slice(0, 6);
+  mk('top', 'topCoinsChart', {type: 'bar', data: {labels: s.map(x => x[0]), datasets: [{data: s.map(x => x[1].pnl), backgroundColor: s.map(x => x[1].pnl >= 0 ? '#5fb59a' : '#d9675d'), borderRadius: 6}]},
+    options: {indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {label: c => usd(c.parsed.x)}}},
+    scales: {x: {grid, ticks: {callback: v => usd0(v), font: {size: 10}}}, y: {grid: {display: false}, ticks: {font: {size: 11}}}}}});
+}
+function dowChart(dow) {
+  const v = ORDER.map(i => dow[i].total), c = ORDER.map(i => dow[i].count);
+  mk('dow', 'dayOfWeekChart', {type: 'bar', data: {labels: ORDER.map(i => DAYS[i]), datasets: [{data: v, backgroundColor: v.map(x => x >= 0 ? 'rgba(95,181,154,.6)' : 'rgba(217,103,93,.6)'), borderRadius: 6}]},
+    options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {label: x => `${usd(x.parsed.y)} (${c[x.dataIndex]} сделок)`}}},
+    scales: {x: {grid: {display: false}}, y: {grid, ticks: {callback: x => usd0(x), font: {size: 10}}}}}});
+}
+
+/* Тепловая карта: 12 строк по 2 часа, суммируем оба часа; симметричная шкала; тултипы с числом сделок и winrate */
+function heatmap(heat) {
+  const rows = [];
+  for (let h = 0; h < 24; h += 2) {
+    rows.push({label: `${String(h).padStart(2, '0')}–${String(h + 2).padStart(2, '0')}`, cells: ORDER.map(d => {
+      const a = heat[h][d], b = heat[h + 1][d];
+      return {sum: a.sum + b.sum, n: a.n + b.n, w: a.w + b.w};
+    })});
+  }
+  const max = Math.max(1, ...rows.flatMap(r => r.cells.map(c => Math.abs(c.sum))));
+  let html = '<div class="hm" role="table" aria-label="PnL по времени суток и дням недели"><div class="hl"></div>' + ORDER.map(d => `<div class="hl" role="columnheader">${DAYS[d]}</div>`).join('');
+  rows.forEach(r => {
+    html += `<div class="hl" role="rowheader">${r.label}</div>`;
+    r.cells.forEach((c, i) => {
+      const k = Math.min(1, Math.abs(c.sum) / max);
+      const bg = c.n === 0 ? 'rgba(236,232,223,.03)' : c.sum > 0 ? `rgba(95,181,154,${.15 + k * .75})` : c.sum < 0 ? `rgba(217,103,93,${.15 + k * .75})` : 'rgba(200,169,106,.12)';
+      const txt = c.n === 0 ? '' : (c.sum > 0 ? '+' : c.sum < 0 ? '−' : '') + Math.round(Math.abs(c.sum));
+      const tt = c.n ? `${DAYS[ORDER[i]]} ${r.label}: ${usd(c.sum)}, ${c.n} сделок, winrate ${(c.w / c.n * 100).toFixed(0)}%` : `${DAYS[ORDER[i]]} ${r.label}: сделок нет`;
+      html += `<div class="hc2" role="cell" tabindex="0" style="background:${bg}" title="${tt}" aria-label="${tt}">${txt}</div>`;
+    });
+  });
+  $('heatmapContainer').innerHTML = html + '</div><div class="hleg"><span>убыток</span><i></i><span>прибыль</span></div><div class="hnote">Сумма PnL за 2 часа, $. Пустая ячейка означает, что сделок не было. Наведите курсор для деталей. ' + CONFIG.TZ_NOTE + '.</div>';
+}
+
+function coinTable(cs) {
+  const s = Object.entries(cs).sort((a, b) => b[1].pnl - a[1].pnl), mx = Math.max(1, ...s.map(x => Math.abs(x[1].pnl)));
+  $('coinTable').querySelector('tbody').innerHTML = s.map(([coin, c]) => {
+    const wr = c.wins / c.total * 100, avg = c.pnl / c.total, w = Math.min(100, Math.abs(c.pnl) / mx * 100);
+    const roi = c.pnl / CONFIG.DEPOSIT_PER_COIN * 100; // доходность монеты от её выделенных 1000 USDT
+    const status = c.total < 5 ? '<span class="tag t-low">МАЛО ДАННЫХ</span>' : (c.pnl > 0 && wr > 55) ? '<span class="tag t-top">ТОП</span>' : c.pnl < 0 ? '<span class="tag t-bad">В МИНУСЕ</span>' : '<span class="tag t-std">СТАНДАРТ</span>';
+    return `<tr><td><div class="coin"><div class="av">${esc(coin.charAt(0))}</div>${esc(coin)}</div></td><td>${c.total}</td>
+    <td class="${wr >= 50 ? 'pos' : 'neg'}">${wr.toFixed(1)}%</td>
+    <td class="${c.pnl >= 0 ? 'pos' : 'neg'}">${usd(c.pnl)} <span style="color:var(--txm);font-weight:400">(${roi >= 0 ? '+' : '−'}${Math.abs(roi).toFixed(1)}%)</span><div class="bar"><i style="width:${w}%;background:${c.pnl >= 0 ? 'var(--green)' : 'var(--red)'}"></i></div></td>
+    <td class="${avg >= 0 ? 'pos' : 'neg'}">${usd(avg)}</td><td class="${c.best >= 0 ? 'pos' : 'neg'}">${usd(c.best)}</td><td class="${c.worst >= 0 ? 'pos' : 'neg'}">${usd(c.worst)}</td><td>${status}</td></tr>`;
+  }).join('');
+}
+
+function insights(a) {
+  const out = [], G = CONFIG.MIN_GROUP;
+  if (a.n < CONFIG.MIN_TRADES) out.push(['warning', '🔬', 'Мало данных', `Всего ${a.n} сделок (нужно от ${CONFIG.MIN_TRADES}). Выводы ниже ориентировочные и могут быть случайностью.`]);
+  if (a.total >= 0) out.push(['success', '✅', 'Период в плюсе', `Чистая прибыль ${usd(a.total)} за ${a.n} сделок. Winrate ${a.winrate.toFixed(1)}%, Profit Factor ${fmtN(a.pf)}.`]);
+  else out.push(['danger', '⚠️', 'Период в минусе', `Убыток ${usd(Math.abs(a.total))}. Проверьте размер позиции, стопы и точки входа.`]);
+  if (a.maxDDPct > 15) out.push(['danger', '📉', 'Глубокая просадка', `${a.maxDDPct.toFixed(1)}% (${usd(a.maxDD)}). Подумайте о снижении риска на сделку.`]);
+  else if (a.maxDDPct > 8) out.push(['warning', '⚡', 'Заметная просадка', `${a.maxDDPct.toFixed(1)}% от депо. Следите за риском и не торгуйте лишнего.`]);
+  if (a.expectancy > 0) out.push(['success', '📊', 'Положительное матожидание', `${usd(a.expectancy)} на сделку.${a.n < CONFIG.MIN_TRADES ? ' Выборка мала для уверенных выводов.' : ''}`]);
+  else out.push(['warning', '📊', 'Отрицательное матожидание', `${usd(a.expectancy)} на сделку: в среднем каждая сделка приносит убыток.`]);
+  if (a.pf > 2 && a.n >= CONFIG.MIN_TRADES) out.push(['success', '💎', 'Высокий Profit Factor', `${fmtN(a.pf)}: прибыльные сделки заметно перекрывают убыточные.`]);
+  out.push(['info', '📐', 'Sharpe и Sortino на сделку', `Sharpe ${nf.format(a.sharpe)}, Sortino ${nf.format(a.sortino)}. Значения не аннуализированы, с годовыми бенчмарками их сравнивать нельзя.`]);
+  const es = Object.entries(a.coinStats).filter(([, c]) => c.total >= G);
+  if (es.length) {
+    const best = es.reduce((x, y) => y[1].pnl > x[1].pnl ? y : x), worst = es.reduce((x, y) => y[1].pnl < x[1].pnl ? y : x);
+    if (best[1].pnl > 0) out.push(['success', '🏆', `Лучший актив: ${esc(best[0])}`, `${usd(best[1].pnl)}, winrate ${(best[1].wins / best[1].total * 100).toFixed(1)}%, ${best[1].total} сделок.`]);
+    if (worst[1].pnl < 0) out.push(['warning', '❄️', `Слабый актив: ${esc(worst[0])}`, `${usd(worst[1].pnl)}, winrate ${(worst[1].wins / worst[1].total * 100).toFixed(1)}%. Стоит уменьшить объём или проанализировать входы.`]);
+  }
+  if (a.maxW >= 5) out.push(['info', '🔥', 'Серия побед', `${a.maxW} подряд. После серии легко поднять риск, держитесь плана.`]);
+  if (a.maxL >= 4) out.push(['danger', '🧊', 'Серия убытков', `${a.maxL} подряд. Разберите сделки и при необходимости сделайте паузу.`]);
+  const lp = a.longs.reduce((s, t) => s + t.pnlNet, 0), sp = a.shorts.reduce((s, t) => s + t.pnlNet, 0);
+  if (a.longs.length >= G && a.shorts.length >= G && Math.abs(lp - sp) > 0) {
+    const [nm, hi, lo] = lp > sp ? ['Лонги', lp, sp] : ['Шорты', sp, lp];
+    out.push([hi > 0 ? 'success' : 'warning', lp > sp ? '📈' : '📉', `${nm} работают лучше`, `Лонги: ${usd(lp)}, шорты: ${usd(sp)}. Разница ${usd(hi - lo)}.`]);
+  }
+  const days = ORDER.filter(i => a.dow[i].count >= G);
+  if (days.length) {
+    const b = days.reduce((x, y) => a.dow[y].total > a.dow[x].total ? y : x);
+    if (a.dow[b].total > 0) out.push(['success', '📅', `Лучший день: ${DAYS[b]}`, `${usd(a.dow[b].total)} за ${a.dow[b].count} сделок.`]);
+  }
+  $('insightsContainer').innerHTML = out.map(([t, i, h, x]) => `<div class="insight ${t}"><div class="ii" aria-hidden="true">${i}</div><div><div class="it">${h}</div><div class="ix">${x}</div></div></div>`).join('');
+}
+
+/* ============ СОБЫТИЯ ============ */
+$('periodFilter').addEventListener('click', e => {
+  const b = e.target.closest('.pill'); if (!b) return;
+  document.querySelectorAll('#periodFilter .pill').forEach(p => p.setAttribute('aria-pressed', p === b));
+  const v = b.dataset.period; period = (v === 'all' || v === 'today') ? v : +v; applyFilters();
+});
+$('directionFilter').addEventListener('change', e => { direction = e.target.value; applyFilters(); });
+$('coinFilter').addEventListener('change', e => { coinSel = e.target.value; applyFilters(); });
+$('refreshBtn').addEventListener('click', loadData);
+$('retryBtn').addEventListener('click', loadData);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && lastOk && Date.now() - lastOk > CONFIG.REFRESH_MS) loadData(); });
+setInterval(() => { if (!document.hidden) loadData(); }, CONFIG.REFRESH_MS);
+setInterval(tick, 30000);
+loadData();
+</script>
+</body>
+</html>
