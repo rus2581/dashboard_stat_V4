@@ -149,7 +149,7 @@ td{font-size:13px}
 .toast{background:var(--bg2);border-radius:6px}
 
 /* Панель депозита */
-.depo{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bd);border:1px solid var(--bd);border-radius:8px;overflow:hidden;margin-bottom:24px}
+.depo{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--bd);border:1px solid var(--bd);border-radius:8px;overflow:hidden;margin-bottom:24px}
 .depo:empty{display:none}
 .depo .stat:first-child{padding:22px 20px}
 .depo .stat:first-child .sv{font:500 22px 'Inter',sans-serif;letter-spacing:-.01em}
@@ -238,7 +238,6 @@ const CONFIG = {
   SHEET_ID: '1pS1Mx71tjvO__5HiQtF-MbudSyUG07LBOs_RkowDC9I',
   GID: '',                  // номер листа (gid=...), пусто = первый лист
   DEPOSIT_PER_COIN: 1000,   // USDT на каждую монету. Общий депо = число монет × это значение
-  ACTIVE_HOURS: 24,         // монета считается «в сделках», если по ней была сделка за последние N часов
   REFRESH_MS: 300000,
   TIMEOUT_MS: 15000,
   MIN_TRADES: 30,           // ниже этого выводы помечаются как ненадёжные
@@ -275,8 +274,7 @@ function coinCount() {
 }
 function getDeposit() { return coinCount() * CONFIG.DEPOSIT_PER_COIN; }
 
-// Панель: общий депо, текущий баланс, сколько задействовано в сделках, сколько свободно.
-// «В сделках» оценивается по таблице: монета считается активной, если по ней была сделка за последние ACTIVE_HOURS часов.
+// Панель: общий депо и текущий баланс (депо + PnL за всё время).
 function depoPanel() {
   const el = $('depoPanel');
   if (!allTrades.length) { el.innerHTML = ''; return; }
@@ -284,18 +282,11 @@ function depoPanel() {
   const scope = coinSel === 'all' ? allTrades : allTrades.filter(t => t.coin === coinSel);
   const n = coinCount(), dep = n * per;
   const pnl = scope.reduce((s, t) => s + t.pnlNet, 0), bal = dep + pnl;
-  const last = {};
-  scope.forEach(t => { last[t.coin] = Math.max(last[t.coin] || 0, t.timestamp); });
-  const lim = Date.now() - CONFIG.ACTIVE_HOURS * 36e5;
-  const act = Object.values(last).filter(ts => ts >= lim).length;
-  const used = act * per, free = dep - used, usedPct = dep ? used / dep * 100 : 0;
   const pc = pnl >= 0 ? 'green' : 'red';
   el.innerHTML = `
   <div class="stat blue"><div class="sl">Общий депозит</div><div class="sv">${usd0(dep)}</div><div class="ss">${n} ${n === 1 ? 'монета' : 'монет'} × ${usd0(per)}</div></div>
   <div class="stat ${pc}"><div class="sl">Текущий баланс</div><div class="sv">${usd(bal)}</div><div class="ss">PnL за всё время ${pnl >= 0 ? '+' : ''}${usd(pnl)} (${(pnl / dep * 100).toFixed(1)}%)</div></div>
-  <div class="stat gold"><div class="sl">В сделках</div><div class="sv">${usd0(used)}</div><div class="ss">${act} из ${n} монет · ${usedPct.toFixed(0)}% депо</div><div class="bar"><i style="width:${usedPct}%;background:var(--blue)"></i></div></div>
-  <div class="stat cyan"><div class="sl">Свободно</div><div class="sv">${usd0(free)}</div><div class="ss">${n - act} ${(n - act) === 1 ? 'монета' : 'монет'} без сделок</div></div>
-  <div class="note">«В сделках» считается по таблице: монета задействована, если по ней была сделка за последние ${CONFIG.ACTIVE_HOURS} ч. Реальные открытые позиции таблица не показывает.</div>`;
+`;
 }
 
 /* ============ ПАРСИНГ ============ */
@@ -366,7 +357,6 @@ function tick() {
   const min = Math.floor((Date.now() - lastOk) / 60000);
   $('lastUpdated').textContent = 'Обновлено ' + lastOk.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
   if (!$('status').classList.contains('err')) setStatus(min >= 10 ? 'stale' : '', min >= 10 ? `Данные ${min} мин назад` : 'Данные актуальны');
-  depoPanel(); // «в сделках» зависит от текущего времени
 }
 
 /* ============ ЗАГРУЗКА ============ */
