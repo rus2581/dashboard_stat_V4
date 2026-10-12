@@ -172,7 +172,8 @@ td{font-size:13px}
 
 @media(max-width:1200px){.stats{grid-template-columns:repeat(3,1fr)}.stat:first-child{grid-column:1/-1}}
 @media(max-width:900px){.container{padding:20px 16px 48px}.stats{grid-template-columns:repeat(2,1fr)}.depo{grid-template-columns:repeat(2,1fr)}}
-.tabs{display:flex;gap:4px;border-bottom:1px solid var(--bd);margin-bottom:24px;overflow-x:auto}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--bd);margin-bottom:24px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
 .tab{background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;color:var(--txm);font-family:inherit;font-weight:600;font-size:14px;padding:10px 16px;cursor:pointer;white-space:nowrap}
 .tab:hover{color:var(--tx)}
 .tab[aria-selected=true]{color:var(--tx);border-bottom-color:var(--blue)}
@@ -198,10 +199,25 @@ td{font-size:13px}
 #tipbox{position:fixed;z-index:10001;max-width:310px;padding:11px 13px;background:#171c27;border:1px solid var(--bdh);border-radius:8px;box-shadow:0 14px 44px rgba(0,0,0,.65);font:400 12.5px/1.5 'Inter',sans-serif;color:var(--tx);pointer-events:none}
 #tipbox[hidden]{display:none}
 
+
+/* ===== СВОРАЧИВАЕМЫЕ ФИЛЬТРЫ ===== */
+.filters{display:block;margin-bottom:20px;padding-bottom:0}
+.frow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.fbar{display:flex;align-items:center;gap:12px;width:100%;padding:10px 0;background:none;border:none;color:var(--tx);font-family:inherit;cursor:pointer;text-align:left}
+.fti{font-size:12px;font-weight:700;color:var(--tx2)}
+.fsum{flex:1;min-width:0;font-size:13px;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fchev{color:var(--txm);font-size:14px;transition:transform .2s}
+.fbar[aria-expanded=true] .fchev{transform:rotate(180deg)}
+.fbar:hover .fti,.fbar:hover .fchev{color:var(--tx)}
+.fbar:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.fbody{padding:4px 0 14px}
+.fbody[hidden]{display:none}
+.fbody .range{margin:12px 0 0}
+
 /* ===== ЗАКРЕПЛЁННЫЕ ВКЛАДКИ: всегда под рукой; на широких экранах — под закреплёнными фильтрами ===== */
 .tabs{position:sticky;top:var(--fh,0px);z-index:29;background:rgba(14,16,19,.95);backdrop-filter:blur(10px);padding-top:6px}
 /* ===== ЗАКРЕПЛЁННЫЕ ФИЛЬТРЫ (только на широких экранах: на телефоне они занимают слишком много места) ===== */
-@media(min-width:901px){.filters{position:sticky;top:0;z-index:30;padding-top:12px;background:rgba(14,16,19,.95);backdrop-filter:blur(10px)}}
+@media(min-width:901px){.filters{position:sticky;top:0;z-index:30;padding-top:2px;background:rgba(14,16,19,.95);backdrop-filter:blur(10px)}}
 </style>
 </head>
 <body>
@@ -221,7 +237,12 @@ td{font-size:13px}
 
 <div id="errbox" role="alert"><span id="errText"></span><button class="btn" type="button" id="retryBtn">Повторить</button></div>
 
-<section class="filters" aria-label="Фильтры">
+<section class="filters" id="filters" aria-label="Фильтры">
+  <button class="fbar" id="filtersToggle" type="button" aria-expanded="false" aria-controls="filtersBody">
+    <span class="fti">Фильтры</span><span class="fsum" id="filtersSummary"></span><span class="fchev" aria-hidden="true">▾</span>
+  </button>
+  <div class="fbody" id="filtersBody" hidden>
+    <div class="frow">
   <span class="fl" id="pl" data-hint="period">Период:</span>
   <div class="pills" id="periodFilter" role="group" aria-labelledby="pl">
     <button class="pill" data-period="today" aria-pressed="false">Сегодня</button>
@@ -238,9 +259,10 @@ td{font-size:13px}
   <div class="sep"></div>
   <label for="coinFilter">Актив:</label>
   <select class="sel" id="coinFilter"><option value="all">Все активы</option></select>
+    </div>
+    <div class="range" id="rangeNote" aria-live="polite"></div>
+  </div>
 </section>
-
-<div class="range" id="rangeNote" aria-live="polite"></div>
 
 <section class="depo" id="depoPanel" aria-label="Депозит"></section>
 <div id="empty"><h2>Нет сделок за выбранный период</h2><p>Расширьте период или сбросьте фильтры направления и актива.</p></div>
@@ -598,6 +620,19 @@ function populateCoins() {
   if (coins.includes(coinSel)) sel.value = coinSel; else { sel.value = 'all'; coinSel = 'all'; }
 }
 
+
+/* Сворачиваемые фильтры: по умолчанию свёрнуты, в строке — краткая сводка */
+$('filtersToggle').addEventListener('click', () => {
+  const open = $('filtersToggle').getAttribute('aria-expanded') !== 'true';
+  $('filtersToggle').setAttribute('aria-expanded', open);
+  $('filtersBody').hidden = !open;
+});
+function filterSummary(n) {
+  const sel = id => { const e = $(id); return e.options[e.selectedIndex] ? e.options[e.selectedIndex].text : ''; };
+  const p = document.querySelector('#periodFilter .pill[aria-pressed=true]');
+  $('filtersSummary').textContent = [`Период: ${p ? p.textContent : ''}`, sel('directionFilter'), sel('coinFilter'), `${n} сделок`].join(' · ');
+}
+
 /* ============ ФИЛЬТРЫ ============ */
 function applyFilters() {
   depoPanel(); coinBalances();
@@ -617,7 +652,7 @@ function applyFilters() {
   const empty = !f.length;
   $('empty').style.display = empty ? 'block' : 'none';
   $('content').style.display = empty ? 'none' : 'block';
-  rangeNote(f);
+  rangeNote(f); filterSummary(f.length);
   if (!empty) updateDashboard(f, prior);
 }
 // Реальный диапазон показанных сделок: «7Д» считается от последней сделки в таблице, а не от сегодняшней даты
