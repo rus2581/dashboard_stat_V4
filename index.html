@@ -14,9 +14,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
-:root{--bg:#0e1013;--bg2:#11151c;--card:rgba(22,27,34,.85);--hover:rgba(30,38,55,.6);--bd:rgba(236,232,223,.08);--bdh:rgba(255,194,71,.3);--tx:#f0f6fc;--tx2:#a1aab5;--txm:#8a877f;--blue:#ffc247;--cyan:#ffc247;--green:#2ee6a8;--red:#ff5d73;--gold:#ffb020}
+:root{--bg:#0e1013;--bg2:#11151c;--card:rgba(22,27,34,.85);--hover:rgba(30,38,55,.6);--bd:rgba(236,232,223,.08);--bdh:rgba(232,180,79,.3);--tx:#f0f6fc;--tx2:#a1aab5;--txm:#8a877f;--blue:#e8b44f;--cyan:#e8b44f;--green:#47cba1;--red:#ee6670;--gold:#e3a52b}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.5;background-image:radial-gradient(circle at 15% 15%,rgba(255,194,71,.06),transparent 40%),radial-gradient(circle at 85% 85%,rgba(255,194,71,.06),transparent 40%)}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.5;background-image:radial-gradient(circle at 15% 15%,rgba(232,180,79,.06),transparent 40%),radial-gradient(circle at 85% 85%,rgba(232,180,79,.06),transparent 40%)}
 .container{max-width:1400px;margin:0 auto;padding:24px}
 :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:16px;padding-bottom:20px;border-bottom:1px solid var(--bd)}
@@ -25,12 +25,12 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
 h1{font-size:22px;font-weight:800;letter-spacing:-.5px}
 .subtitle{font-size:12px;color:var(--txm);font-weight:600}
 .hc{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.live{display:flex;align-items:center;gap:8px;border:1px solid rgba(46,230,168,.25);background:rgba(46,230,168,.1);padding:7px 14px;border-radius:24px;font-size:12px;font-weight:700;color:var(--green)}
-.live.stale{color:var(--gold);border-color:rgba(255,176,32,.3);background:rgba(255,176,32,.1)}
-.live.err{color:var(--red);border-color:rgba(255,93,115,.3);background:rgba(255,93,115,.1)}
+.live{display:flex;align-items:center;gap:8px;border:1px solid rgba(71,203,161,.25);background:rgba(71,203,161,.1);padding:7px 14px;border-radius:24px;font-size:12px;font-weight:700;color:var(--green)}
+.live.stale{color:var(--gold);border-color:rgba(227,165,43,.3);background:rgba(227,165,43,.1)}
+.live.err{color:var(--red);border-color:rgba(238,102,112,.3);background:rgba(238,102,112,.1)}
 .dot{width:8px;height:8px;background:currentColor;border-radius:50%}
 .live:not(.err):not(.stale) .dot{animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(46,230,168,.6)}50%{box-shadow:0 0 0 6px rgba(46,230,168,0)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(71,203,161,.6)}50%{box-shadow:0 0 0 6px rgba(71,203,161,0)}}
 .btn{padding:9px 16px;border:1px solid var(--bdh);background:var(--card);color:var(--tx);border-radius:8px;font-weight:600;font-size:13px;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:8px}
 .btn:hover{background:var(--hover);border-color:var(--blue)}
 .btn:disabled{opacity:.5;cursor:not-allowed}
@@ -56,9 +56,9 @@ h1{font-size:22px;font-weight:800;letter-spacing:-.5px}
 .ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
 .ct{font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px}
 .ci{width:28px;height:28px;background:linear-gradient(135deg,var(--blue),var(--cyan));border-radius:6px;display:grid;place-items:center;font-size:14px}
-.badge{padding:4px 10px;background:rgba(255,194,71,.1);border:1px solid rgba(255,194,71,.2);border-radius:12px;font:700 11px 'Inter',sans-serif;color:var(--blue)}
-.badge.green{background:rgba(46,230,168,.1);border-color:rgba(46,230,168,.2);color:var(--green)}
-.badge.red{background:rgba(255,93,115,.1);border-color:rgba(255,93,115,.2);color:var(--red)}
+.badge{padding:4px 10px;background:rgba(232,180,79,.1);border:1px solid rgba(232,180,79,.2);border-radius:12px;font:700 11px 'Inter',sans-serif;color:var(--blue)}
+.badge.green{background:rgba(71,203,161,.1);border-color:rgba(71,203,161,.2);color:var(--green)}
+.badge.red{background:rgba(238,102,112,.1);border-color:rgba(238,102,112,.2);color:var(--red)}
 .g2{display:grid;grid-template-columns:1.5fr 1fr;gap:20px;align-items:start}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
 .g2>*,.g3>*{min-width:0}
@@ -72,15 +72,15 @@ tbody tr:hover{background:var(--hover)}tbody tr:last-child td{border-bottom:none
 .av{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:grid;place-items:center;font-size:11px;font-weight:800;color:#0e1013;flex-shrink:0}
 .pos{color:var(--green);font-weight:600}.neg{color:var(--red);font-weight:600}
 .tag{display:inline-block;font:700 10px 'Inter',sans-serif;padding:3px 8px;border-radius:8px;border:1px solid}
-.t-top{background:rgba(46,230,168,.15);color:var(--green);border-color:rgba(46,230,168,.25)}
-.t-bad{background:rgba(255,93,115,.15);color:var(--red);border-color:rgba(255,93,115,.25)}
-.t-std{background:rgba(255,194,71,.15);color:var(--cyan);border-color:rgba(255,194,71,.25)}
+.t-top{background:rgba(71,203,161,.15);color:var(--green);border-color:rgba(71,203,161,.25)}
+.t-bad{background:rgba(238,102,112,.15);color:var(--red);border-color:rgba(238,102,112,.25)}
+.t-std{background:rgba(232,180,79,.15);color:var(--cyan);border-color:rgba(232,180,79,.25)}
 .t-low{background:rgba(139,148,158,.15);color:var(--tx2);border-color:rgba(139,148,158,.25)}
 .bar{height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%}
-.insight{display:flex;gap:14px;padding:14px;background:rgba(255,194,71,.04);border:1px solid rgba(255,194,71,.1);border-radius:10px;margin-bottom:10px}
-.insight.success{background:rgba(46,230,168,.04);border-color:rgba(46,230,168,.15)}
-.insight.warning{background:rgba(255,176,32,.04);border-color:rgba(255,176,32,.15)}
-.insight.danger{background:rgba(255,93,115,.04);border-color:rgba(255,93,115,.15)}
+.insight{display:flex;gap:14px;padding:14px;background:rgba(232,180,79,.04);border:1px solid rgba(232,180,79,.1);border-radius:10px;margin-bottom:10px}
+.insight.success{background:rgba(71,203,161,.04);border-color:rgba(71,203,161,.15)}
+.insight.warning{background:rgba(227,165,43,.04);border-color:rgba(227,165,43,.15)}
+.insight.danger{background:rgba(238,102,112,.04);border-color:rgba(238,102,112,.15)}
 .ii{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.06);display:grid;place-items:center;flex-shrink:0}
 .it{font-weight:700;font-size:13px;margin-bottom:3px}.ix{font-size:12px;color:var(--tx2);line-height:1.4}
 /* Heatmap */
@@ -89,13 +89,13 @@ tbody tr:hover{background:var(--hover)}tbody tr:last-child td{border-bottom:none
 .hc2{height:26px;display:flex;align-items:center;justify-content:center;border-radius:4px;font:600 10px 'Inter',sans-serif;color:#fff;cursor:default;overflow:hidden}
 .hc2:hover,.hc2:focus-visible{outline:2px solid var(--blue);position:relative;z-index:2}
 .hleg{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:11px;color:var(--txm)}
-.hleg i{flex:1;max-width:180px;height:8px;border-radius:4px;background:linear-gradient(90deg,rgba(255,93,115,.9),rgba(255,93,115,.15),rgba(255,194,71,.12),rgba(46,230,168,.15),rgba(46,230,168,.9))}
+.hleg i{flex:1;max-width:180px;height:8px;border-radius:4px;background:linear-gradient(90deg,rgba(238,102,112,.9),rgba(238,102,112,.15),rgba(232,180,79,.12),rgba(71,203,161,.15),rgba(71,203,161,.9))}
 .hnote{font-size:11px;color:var(--txm);margin-top:8px}
 #loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .4s}
 #loading.off{opacity:0;pointer-events:none}
 .loader{width:50px;height:50px;border:3px solid var(--bd);border-top-color:var(--blue);border-right-color:var(--cyan);border-radius:50%;animation:spin 1s linear infinite}
 .lt{margin-top:16px;color:var(--tx2);font-size:13px;font-weight:600}
-#errbox{display:none;margin-bottom:20px;padding:16px;border:1px solid rgba(255,93,115,.4);background:rgba(255,93,115,.08);border-radius:12px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#errbox{display:none;margin-bottom:20px;padding:16px;border:1px solid rgba(238,102,112,.4);background:rgba(238,102,112,.08);border-radius:12px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 #empty{display:none;text-align:center;padding:60px 20px;color:var(--tx2)}
 .toast{position:fixed;top:24px;right:24px;padding:12px 18px;background:#161b22;border:1px solid var(--bdh);border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.6);font-size:13px;font-weight:600;transform:translateX(calc(100% + 24px));transition:transform .3s;z-index:10000;max-width:calc(100vw - 32px)}
 .toast.show{transform:none}
@@ -105,7 +105,7 @@ tbody tr:hover{background:var(--hover)}tbody tr:last-child td{border-bottom:none
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* ===== PREMIUM THEME ===== */
-:root{--bg:#0e1013;--bg2:#15181d;--card:#13161a;--hover:#191d23;--bd:rgba(236,232,223,.09);--bdh:rgba(255,194,71,.4);--tx:#ece8df;--tx2:#a8a49b;--txm:#8a877f;--blue:#ffc247;--cyan:#5ad7ff;--gold:#ff9f43;--green:#2ee6a8;--red:#ff5d73;--serif:'Fraunces',Georgia,serif}
+:root{--bg:#0e1013;--bg2:#15181d;--card:#13161a;--hover:#191d23;--bd:rgba(236,232,223,.09);--bdh:rgba(232,180,79,.4);--tx:#ece8df;--tx2:#a8a49b;--txm:#8a877f;--blue:#e8b44f;--cyan:#6cc4e6;--gold:#ee9a52;--green:#47cba1;--red:#ee6670;--serif:'Fraunces',Georgia,serif}
 body{background:var(--bg);background-image:none;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
 .container{max-width:1320px;padding:32px 32px 64px}
 .header{border-bottom:1px solid var(--bd);padding-bottom:24px;margin-bottom:32px}
@@ -146,7 +146,7 @@ td{font-size:13px}
 .ii{display:none}
 .it{font-size:14px}.ix{font-size:13px}
 .hc2{border-radius:2px}
-.hleg i{background:linear-gradient(90deg,rgba(255,93,115,.9),rgba(255,93,115,.15),rgba(236,232,223,.06),rgba(46,230,168,.15),rgba(46,230,168,.9))}
+.hleg i{background:linear-gradient(90deg,rgba(238,102,112,.9),rgba(238,102,112,.15),rgba(236,232,223,.06),rgba(71,203,161,.15),rgba(71,203,161,.9))}
 .toast{background:var(--bg2);border-radius:6px}
 
 /* Панель депозита */
@@ -162,7 +162,7 @@ td{font-size:13px}
 .depo.four{grid-template-columns:repeat(4,1fr)}
 .cb{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
 .cbi{border:1px solid var(--bd);border-radius:6px;padding:14px 16px;background:var(--bg)}
-.cbi.warn{border-color:rgba(255,93,115,.55)}
+.cbi.warn{border-color:rgba(238,102,112,.55)}
 .cbh{display:flex;justify-content:space-between;align-items:baseline;font-size:13px}
 .cbn{font-weight:700;font-size:14px}
 .cbv{font:500 20px 'Inter',sans-serif;margin:6px 0 2px}
@@ -191,8 +191,8 @@ td{font-size:13px}
 .tw.scroll th{position:sticky;top:0;background:var(--card);z-index:1}
 
 /* ===== ЯРКАЯ ТЕМА ===== */
-body{background-image:radial-gradient(900px 520px at 6% -6%,rgba(124,92,255,.17),transparent 62%),radial-gradient(800px 480px at 100% 0,rgba(255,194,71,.10),transparent 60%),radial-gradient(900px 600px at 82% 104%,rgba(46,230,168,.09),transparent 60%);background-attachment:fixed}
-.logo{background:linear-gradient(135deg,#ffc247,#ff7a59 55%,#c05cff);border:none}
+body{background-image:radial-gradient(900px 520px at 6% -6%,rgba(124,92,255,.17),transparent 62%),radial-gradient(800px 480px at 100% 0,rgba(232,180,79,.10),transparent 60%),radial-gradient(900px 600px at 82% 104%,rgba(71,203,161,.09),transparent 60%);background-attachment:fixed}
+.logo{background:linear-gradient(135deg,#e8b44f,#ff7a59 55%,#c05cff);border:none}
 .logo::after{color:#0b0e14}
 .subtitle{color:var(--tx2)}
 .stats .stat,.depo .stat{box-shadow:inset 0 2px 0 var(--blue)}
@@ -200,12 +200,12 @@ body{background-image:radial-gradient(900px 520px at 6% -6%,rgba(124,92,255,.17)
 .stats .stat.red,.depo .stat.red{box-shadow:inset 0 2px 0 var(--red)}
 .stats .stat.gold,.depo .stat.gold{box-shadow:inset 0 2px 0 var(--gold)}
 .stats .stat.cyan,.depo .stat.cyan{box-shadow:inset 0 2px 0 var(--cyan)}
-.stat:first-child .sv{text-shadow:0 0 34px color-mix(in srgb,currentColor 40%,transparent)}
-.tab[aria-selected=true]{border-image:linear-gradient(90deg,#ffc247,#ff7a59 60%,#c05cff) 1}
-.btn:hover{box-shadow:0 0 0 1px var(--blue),0 6px 22px rgba(255,194,71,.18)}
+.stat:first-child .sv{text-shadow:0 0 34px color-mix(in srgb,currentColor 18%,transparent)}
+.tab[aria-selected=true]{border-image:linear-gradient(90deg,#e8b44f,#ff7a59 60%,#c05cff) 1}
+.btn:hover{box-shadow:0 0 0 1px var(--blue),0 6px 22px rgba(232,180,79,.18)}
 .card{box-shadow:0 1px 0 rgba(255,255,255,.03) inset}
-.card:hover{border-color:rgba(255,194,71,.25)}
-.cbi:hover{border-color:rgba(255,194,71,.35)}
+.card:hover{border-color:rgba(232,180,79,.25)}
+.cbi:hover{border-color:rgba(232,180,79,.35)}
 
 /* ===== ПОДСКАЗКИ ===== */
 .hint{display:inline-grid;place-items:center;width:15px;height:15px;margin-left:7px;border-radius:50%;border:1px solid var(--txm);color:var(--txm);font:700 10px/1 'Inter',sans-serif;font-style:normal;letter-spacing:0;text-transform:none;cursor:help;vertical-align:middle;user-select:none}
@@ -709,7 +709,7 @@ function analyze(trades, base) {
 }
 
 /* ============ ОТРИСОВКА ============ */
-const tip = {backgroundColor: 'rgba(9,12,16,.95)', borderColor: 'rgba(255,194,71,.3)', borderWidth: 1, padding: 10};
+const tip = {backgroundColor: 'rgba(9,12,16,.95)', borderColor: 'rgba(232,180,79,.3)', borderWidth: 1, padding: 10};
 const grid = {color: 'rgba(236,232,223,.04)'};
 function mk(key, id, cfg) { if (charts[key]) charts[key].destroy(); charts[key] = new Chart($(id), cfg); }
 const fmtN = v => Number.isFinite(v) ? nf.format(v) : '∞';
@@ -755,8 +755,8 @@ const fmtDate = d => d.toLocaleDateString('ru-RU', {day: '2-digit', month: '2-di
 function equityChart(trades, eq) {
   mk('equity', 'equityChart', {type: 'line', data: {
     labels: trades.map(t => fmtDate(t.date)),
-    datasets: [{label: 'Накопленный PnL', data: eq.map(e => e.value), borderColor: '#ffc247', borderWidth: 2.5, fill: true, tension: 0, pointRadius: 0, pointHoverRadius: 5,
-      backgroundColor: c => { const g = c.chart.ctx.createLinearGradient(0, 0, 0, c.chart.height || 400); g.addColorStop(0, 'rgba(255,194,71,.25)'); g.addColorStop(1, 'rgba(255,194,71,0)'); return g; }}]},
+    datasets: [{label: 'Накопленный PnL', data: eq.map(e => e.value), borderColor: '#e8b44f', borderWidth: 2.5, fill: true, tension: 0, pointRadius: 0, pointHoverRadius: 5,
+      backgroundColor: c => { const g = c.chart.ctx.createLinearGradient(0, 0, 0, c.chart.height || 400); g.addColorStop(0, 'rgba(232,180,79,.25)'); g.addColorStop(1, 'rgba(232,180,79,0)'); return g; }}]},
     options: {responsive: true, maintainAspectRatio: false, interaction: {mode: 'index', intersect: false},
     plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {title: i => `Сделка №${i[0].dataIndex + 1} · ${i[0].label}`, label: c => `Накопленный PnL: ${usd(c.parsed.y)}`}}},
     scales: {x: {grid: {display: false}, ticks: {maxTicksLimit: XT(8), font: {size: 10}}}, y: {grid, ticks: {callback: v => usd0(v), font: {size: 10}}, afterFit: s => { s.width = 64; }}}}});
@@ -765,7 +765,7 @@ function equityChart(trades, eq) {
 function underwaterChart(eq, trades) {
   mk('dd', 'ddChart', {type: 'line', data: {
     labels: trades.map(t => fmtDate(t.date)),
-    datasets: [{label: 'Просадка от пика, %', data: eq.map(e => -e.ddPct), borderColor: '#ff5d73', backgroundColor: 'rgba(255,93,115,.18)', fill: true, borderWidth: 1.5, tension: 0, pointRadius: 0, pointHoverRadius: 4}]},
+    datasets: [{label: 'Просадка от пика, %', data: eq.map(e => -e.ddPct), borderColor: '#ee6670', backgroundColor: 'rgba(238,102,112,.18)', fill: true, borderWidth: 1.5, tension: 0, pointRadius: 0, pointHoverRadius: 4}]},
     options: {responsive: true, maintainAspectRatio: false, interaction: {mode: 'index', intersect: false},
     plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {title: i => `Сделка №${i[0].dataIndex + 1} · ${i[0].label}`, label: c => `Просадка: ${(-c.parsed.y).toFixed(1)}% (${usd(-eq[c.dataIndex].drawdown)})`}}},
     scales: {x: {grid: {display: false}, ticks: {maxTicksLimit: XT(8), font: {size: 10}}}, y: {max: 0, suggestedMin: -1, grid, ticks: {callback: v => (Math.round(v * 10) / 10) + '%', font: {size: 10}}, afterFit: s => { s.width = 64; }}}}});
@@ -817,7 +817,7 @@ function setTab(name, focus) {
 function dailyChart(d) {
   const keys = Object.keys(d).sort(), v = keys.map(k => d[k]);
   mk('daily', 'dailyChart', {type: 'bar', data: {labels: keys.map(k => { const [y, m, dd] = k.split('-'); return `${dd}.${m}`; }),
-    datasets: [{data: v, backgroundColor: v.map(x => x >= 0 ? 'rgba(46,230,168,.6)' : 'rgba(255,93,115,.6)'), borderRadius: 4}]},
+    datasets: [{data: v, backgroundColor: v.map(x => x >= 0 ? 'rgba(71,203,161,.6)' : 'rgba(238,102,112,.6)'), borderRadius: 4}]},
     options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {label: c => usd(c.parsed.y)}}},
     scales: {x: {grid: {display: false}, ticks: {maxTicksLimit: XT(8), font: {size: 10}, maxRotation: 0}}, y: {grid, ticks: {callback: x => usd0(x), font: {size: 10}}}}}});
 }
@@ -832,7 +832,7 @@ function distChart(trades) {
   p.forEach(x => bk[Math.min(bins - 1, Math.floor((x - lo0) / size))]++);
   const mid = i => lo0 + (i + .5) * size;
   mk('dist', 'distributionChart', {type: 'bar', data: {labels: bk.map((_, i) => `${usd0(lo0 + i * size)}…${usd0(lo0 + (i + 1) * size)}`),
-    datasets: [{data: bk, backgroundColor: bk.map((_, i) => mid(i) >= 0 ? 'rgba(46,230,168,.6)' : 'rgba(255,93,115,.6)'), borderRadius: 4}]},
+    datasets: [{data: bk, backgroundColor: bk.map((_, i) => mid(i) >= 0 ? 'rgba(71,203,161,.6)' : 'rgba(238,102,112,.6)'), borderRadius: 4}]},
     options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {label: c => `${c.parsed.y} сделок`}}},
     scales: {x: {grid: {display: false}, ticks: {font: {size: 9}, maxRotation: 45, autoSkip: true, maxTicksLimit: XT(6)}}, y: {grid, ticks: {precision: 0, font: {size: 10}}}}}});
 }
@@ -840,13 +840,13 @@ function lsChart(L, S) {
   const st = a => ({pnl: a.reduce((s, t) => s + t.pnlNet, 0), wr: a.length ? a.filter(t => t.pnlNet > 0).length / a.length * 100 : 0, n: a.length});
   const l = st(L), s = st(S), vals = [l.pnl, s.pnl];
   mk('ls', 'longShortChart', {type: 'bar', data: {labels: [`Лонги (${l.n})`, `Шорты (${s.n})`],
-    datasets: [{data: vals, backgroundColor: vals.map(v => v >= 0 ? 'rgba(46,230,168,.6)' : 'rgba(255,93,115,.6)'), borderRadius: 6}]},
+    datasets: [{data: vals, backgroundColor: vals.map(v => v >= 0 ? 'rgba(71,203,161,.6)' : 'rgba(238,102,112,.6)'), borderRadius: 6}]},
     options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {label: c => `PnL: ${usd(c.parsed.y)} · WR ${[l, s][c.dataIndex].wr.toFixed(0)}%`}}},
     scales: {x: {grid: {display: false}}, y: {grid, ticks: {callback: v => usd0(v), font: {size: 10}}}}}});
 }
 function dowChart(dow) {
   const v = ORDER.map(i => dow[i].total), c = ORDER.map(i => dow[i].count);
-  mk('dow', 'dayOfWeekChart', {type: 'bar', data: {labels: ORDER.map(i => DAYS[i]), datasets: [{data: v, backgroundColor: v.map(x => x >= 0 ? 'rgba(46,230,168,.6)' : 'rgba(255,93,115,.6)'), borderRadius: 6}]},
+  mk('dow', 'dayOfWeekChart', {type: 'bar', data: {labels: ORDER.map(i => DAYS[i]), datasets: [{data: v, backgroundColor: v.map(x => x >= 0 ? 'rgba(71,203,161,.6)' : 'rgba(238,102,112,.6)'), borderRadius: 6}]},
     options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {label: x => `${usd(x.parsed.y)} (${c[x.dataIndex]} сделок)`}}},
     scales: {x: {grid: {display: false}}, y: {grid, ticks: {callback: x => usd0(x), font: {size: 10}}}}}});
 }
@@ -867,7 +867,7 @@ function heatmap(heat) {
     html += `<div class="hr" role="row"><div class="hl" role="rowheader">${r.label}</div>`;
     r.cells.forEach((c, i) => {
       const k = Math.min(1, Math.abs(c.sum) / max);
-      const bg = c.n === 0 ? 'rgba(236,232,223,.03)' : c.sum > 0 ? `rgba(46,230,168,${.15 + k * .75})` : c.sum < 0 ? `rgba(255,93,115,${.15 + k * .75})` : 'rgba(255,194,71,.12)';
+      const bg = c.n === 0 ? 'rgba(236,232,223,.03)' : c.sum > 0 ? `rgba(71,203,161,${.15 + k * .75})` : c.sum < 0 ? `rgba(238,102,112,${.15 + k * .75})` : 'rgba(232,180,79,.12)';
       const rs = Math.round(Math.abs(c.sum)), txt = c.n === 0 ? '' : rs === 0 ? '0' : (c.sum > 0 ? '+' : '−') + rs;
       const tt = c.n ? `${DAYS[ORDER[i]]} ${r.label}: ${usd(c.sum)}, ${c.n} сделок, winrate ${(c.w / c.n * 100).toFixed(0)}%` : `${DAYS[ORDER[i]]} ${r.label}: сделок нет`;
       html += `<div class="hc2" role="cell" style="background:${bg};color:${c.n && k > .5 ? '#0b0e14' : '#fff'}" title="${tt}" aria-label="${tt}">${txt}</div>`;
@@ -947,9 +947,9 @@ function rollingChart(a, trades) {
     options: {responsive: true, maintainAspectRatio: false, interaction: {mode: 'index', intersect: false},
     plugins: {legend: {labels: {usePointStyle: true, font: {size: 11}}}, tooltip: {...tip, callbacks: {title: i => `Сделка №${a.roll[i[0].dataIndex].i + 1} · ${i[0].label}`, label: c => `${c.dataset.label}: ${fmt(c.parsed.y)}`}}},
     scales: {x: {grid: {display: false}, ticks: {maxTicksLimit: XT(6), font: {size: 10}}}, y: {...yExtra, ticks: {callback: v => fmt(v), font: {size: 10}}}}}});
-  one('rollExp', 'rollExpChart', `Окно ${W} сделок`, a.roll.map(r => r.exp), a.expectancy, '#ffc247', usd,
+  one('rollExp', 'rollExpChart', `Окно ${W} сделок`, a.roll.map(r => r.exp), a.expectancy, '#e8b44f', usd,
       {grid: {color: c => c.tick && c.tick.value === 0 ? 'rgba(236,232,223,.28)' : 'rgba(236,232,223,.04)'}});
-  one('rollWr', 'rollWrChart', `Окно ${W} сделок`, a.roll.map(r => r.wr), a.winrate, '#ffc247', v => v.toFixed(0) + '%', {min: 0, max: 100, grid});
+  one('rollWr', 'rollWrChart', `Окно ${W} сделок`, a.roll.map(r => r.wr), a.winrate, '#e8b44f', v => v.toFixed(0) + '%', {min: 0, max: 100, grid});
 }
 
 /* Таблица по месяцам: PnL, % к текущему депо, winrate */
