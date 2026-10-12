@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
-<meta name="color-scheme" content="dark">
 <title>Trading Pro Analytics</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,9 +13,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
-:root{--bg:#0e1013;--bg2:#11151c;--card:rgba(22,27,34,.85);--hover:rgba(30,38,55,.6);--bd:rgba(236,232,223,.08);--bdh:rgba(232,180,79,.3);--tx:#f0f6fc;--tx2:#a1aab5;--txm:#8a877f;--blue:#e8b44f;--cyan:#e8b44f;--green:#47cba1;--red:#ee6670;--gold:#e3a52b}
+:root{--bg:#0e1013;--bg2:#11151c;--card:rgba(22,27,34,.85);--hover:rgba(30,38,55,.6);--bd:rgba(236,232,223,.08);--bdh:rgba(200,169,106,.3);--tx:#f0f6fc;--tx2:#a1aab5;--txm:#8a877f;--blue:#c8a96a;--cyan:#c8a96a;--green:#5fb59a;--red:#d9675d;--gold:#d29922}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.5;background-image:radial-gradient(circle at 15% 15%,rgba(232,180,79,.06),transparent 40%),radial-gradient(circle at 85% 85%,rgba(232,180,79,.06),transparent 40%)}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.5;background-image:radial-gradient(circle at 15% 15%,rgba(200,169,106,.06),transparent 40%),radial-gradient(circle at 85% 85%,rgba(200,169,106,.06),transparent 40%)}
 .container{max-width:1400px;margin:0 auto;padding:24px}
 :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:16px;padding-bottom:20px;border-bottom:1px solid var(--bd)}
@@ -25,12 +24,12 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
 h1{font-size:22px;font-weight:800;letter-spacing:-.5px}
 .subtitle{font-size:12px;color:var(--txm);font-weight:600}
 .hc{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.live{display:flex;align-items:center;gap:8px;border:1px solid rgba(71,203,161,.25);background:rgba(71,203,161,.1);padding:7px 14px;border-radius:24px;font-size:12px;font-weight:700;color:var(--green)}
-.live.stale{color:var(--gold);border-color:rgba(227,165,43,.3);background:rgba(227,165,43,.1)}
-.live.err{color:var(--red);border-color:rgba(238,102,112,.3);background:rgba(238,102,112,.1)}
+.live{display:flex;align-items:center;gap:8px;border:1px solid rgba(95,181,154,.25);background:rgba(95,181,154,.1);padding:7px 14px;border-radius:24px;font-size:12px;font-weight:700;color:var(--green)}
+.live.stale{color:var(--gold);border-color:rgba(210,153,34,.3);background:rgba(210,153,34,.1)}
+.live.err{color:var(--red);border-color:rgba(217,103,93,.3);background:rgba(217,103,93,.1)}
 .dot{width:8px;height:8px;background:currentColor;border-radius:50%}
 .live:not(.err):not(.stale) .dot{animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(71,203,161,.6)}50%{box-shadow:0 0 0 6px rgba(71,203,161,0)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(95,181,154,.6)}50%{box-shadow:0 0 0 6px rgba(95,181,154,0)}}
 .btn{padding:9px 16px;border:1px solid var(--bdh);background:var(--card);color:var(--tx);border-radius:8px;font-weight:600;font-size:13px;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:8px}
 .btn:hover{background:var(--hover);border-color:var(--blue)}
 .btn:disabled{opacity:.5;cursor:not-allowed}
@@ -56,9 +55,9 @@ h1{font-size:22px;font-weight:800;letter-spacing:-.5px}
 .ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
 .ct{font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px}
 .ci{width:28px;height:28px;background:linear-gradient(135deg,var(--blue),var(--cyan));border-radius:6px;display:grid;place-items:center;font-size:14px}
-.badge{padding:4px 10px;background:rgba(232,180,79,.1);border:1px solid rgba(232,180,79,.2);border-radius:12px;font:700 11px 'Inter',sans-serif;color:var(--blue)}
-.badge.green{background:rgba(71,203,161,.1);border-color:rgba(71,203,161,.2);color:var(--green)}
-.badge.red{background:rgba(238,102,112,.1);border-color:rgba(238,102,112,.2);color:var(--red)}
+.badge{padding:4px 10px;background:rgba(200,169,106,.1);border:1px solid rgba(200,169,106,.2);border-radius:12px;font:700 11px 'Inter',sans-serif;color:var(--blue)}
+.badge.green{background:rgba(95,181,154,.1);border-color:rgba(95,181,154,.2);color:var(--green)}
+.badge.red{background:rgba(217,103,93,.1);border-color:rgba(217,103,93,.2);color:var(--red)}
 .g2{display:grid;grid-template-columns:1.5fr 1fr;gap:20px;align-items:start}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
 .g2>*,.g3>*{min-width:0}
@@ -72,15 +71,15 @@ tbody tr:hover{background:var(--hover)}tbody tr:last-child td{border-bottom:none
 .av{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:grid;place-items:center;font-size:11px;font-weight:800;color:#0e1013;flex-shrink:0}
 .pos{color:var(--green);font-weight:600}.neg{color:var(--red);font-weight:600}
 .tag{display:inline-block;font:700 10px 'Inter',sans-serif;padding:3px 8px;border-radius:8px;border:1px solid}
-.t-top{background:rgba(71,203,161,.15);color:var(--green);border-color:rgba(71,203,161,.25)}
-.t-bad{background:rgba(238,102,112,.15);color:var(--red);border-color:rgba(238,102,112,.25)}
-.t-std{background:rgba(232,180,79,.15);color:var(--cyan);border-color:rgba(232,180,79,.25)}
+.t-top{background:rgba(95,181,154,.15);color:var(--green);border-color:rgba(95,181,154,.25)}
+.t-bad{background:rgba(217,103,93,.15);color:var(--red);border-color:rgba(217,103,93,.25)}
+.t-std{background:rgba(200,169,106,.15);color:var(--cyan);border-color:rgba(200,169,106,.25)}
 .t-low{background:rgba(139,148,158,.15);color:var(--tx2);border-color:rgba(139,148,158,.25)}
 .bar{height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%}
-.insight{display:flex;gap:14px;padding:14px;background:rgba(232,180,79,.04);border:1px solid rgba(232,180,79,.1);border-radius:10px;margin-bottom:10px}
-.insight.success{background:rgba(71,203,161,.04);border-color:rgba(71,203,161,.15)}
-.insight.warning{background:rgba(227,165,43,.04);border-color:rgba(227,165,43,.15)}
-.insight.danger{background:rgba(238,102,112,.04);border-color:rgba(238,102,112,.15)}
+.insight{display:flex;gap:14px;padding:14px;background:rgba(200,169,106,.04);border:1px solid rgba(200,169,106,.1);border-radius:10px;margin-bottom:10px}
+.insight.success{background:rgba(95,181,154,.04);border-color:rgba(95,181,154,.15)}
+.insight.warning{background:rgba(210,153,34,.04);border-color:rgba(210,153,34,.15)}
+.insight.danger{background:rgba(217,103,93,.04);border-color:rgba(217,103,93,.15)}
 .ii{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.06);display:grid;place-items:center;flex-shrink:0}
 .it{font-weight:700;font-size:13px;margin-bottom:3px}.ix{font-size:12px;color:var(--tx2);line-height:1.4}
 /* Heatmap */
@@ -89,13 +88,13 @@ tbody tr:hover{background:var(--hover)}tbody tr:last-child td{border-bottom:none
 .hc2{height:26px;display:flex;align-items:center;justify-content:center;border-radius:4px;font:600 10px 'Inter',sans-serif;color:#fff;cursor:default;overflow:hidden}
 .hc2:hover,.hc2:focus-visible{outline:2px solid var(--blue);position:relative;z-index:2}
 .hleg{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:11px;color:var(--txm)}
-.hleg i{flex:1;max-width:180px;height:8px;border-radius:4px;background:linear-gradient(90deg,rgba(238,102,112,.9),rgba(238,102,112,.15),rgba(232,180,79,.12),rgba(71,203,161,.15),rgba(71,203,161,.9))}
+.hleg i{flex:1;max-width:180px;height:8px;border-radius:4px;background:linear-gradient(90deg,rgba(217,103,93,.9),rgba(217,103,93,.15),rgba(200,169,106,.12),rgba(95,181,154,.15),rgba(95,181,154,.9))}
 .hnote{font-size:11px;color:var(--txm);margin-top:8px}
 #loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .4s}
 #loading.off{opacity:0;pointer-events:none}
 .loader{width:50px;height:50px;border:3px solid var(--bd);border-top-color:var(--blue);border-right-color:var(--cyan);border-radius:50%;animation:spin 1s linear infinite}
 .lt{margin-top:16px;color:var(--tx2);font-size:13px;font-weight:600}
-#errbox{display:none;margin-bottom:20px;padding:16px;border:1px solid rgba(238,102,112,.4);background:rgba(238,102,112,.08);border-radius:12px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#errbox{display:none;margin-bottom:20px;padding:16px;border:1px solid rgba(217,103,93,.4);background:rgba(217,103,93,.08);border-radius:12px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 #empty{display:none;text-align:center;padding:60px 20px;color:var(--tx2)}
 .toast{position:fixed;top:24px;right:24px;padding:12px 18px;background:#161b22;border:1px solid var(--bdh);border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.6);font-size:13px;font-weight:600;transform:translateX(calc(100% + 24px));transition:transform .3s;z-index:10000;max-width:calc(100vw - 32px)}
 .toast.show{transform:none}
@@ -105,7 +104,7 @@ tbody tr:hover{background:var(--hover)}tbody tr:last-child td{border-bottom:none
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* ===== PREMIUM THEME ===== */
-:root{--bg:#0e1013;--bg2:#15181d;--card:#13161a;--hover:#191d23;--bd:rgba(236,232,223,.09);--bdh:rgba(232,180,79,.4);--tx:#ece8df;--tx2:#a8a49b;--txm:#8a877f;--blue:#e8b44f;--cyan:#6cc4e6;--gold:#ee9a52;--green:#47cba1;--red:#ee6670;--serif:'Fraunces',Georgia,serif}
+:root{--bg:#0e1013;--bg2:#15181d;--card:#13161a;--hover:#191d23;--bd:rgba(236,232,223,.09);--bdh:rgba(200,169,106,.4);--tx:#ece8df;--tx2:#a8a49b;--txm:#8a877f;--blue:#c8a96a;--cyan:#c8a96a;--gold:#e3a23b;--green:#5fb59a;--red:#d9675d;--serif:'Fraunces',Georgia,serif}
 body{background:var(--bg);background-image:none;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
 .container{max-width:1320px;padding:32px 32px 64px}
 .header{border-bottom:1px solid var(--bd);padding-bottom:24px;margin-bottom:32px}
@@ -146,7 +145,7 @@ td{font-size:13px}
 .ii{display:none}
 .it{font-size:14px}.ix{font-size:13px}
 .hc2{border-radius:2px}
-.hleg i{background:linear-gradient(90deg,rgba(238,102,112,.9),rgba(238,102,112,.15),rgba(236,232,223,.06),rgba(71,203,161,.15),rgba(71,203,161,.9))}
+.hleg i{background:linear-gradient(90deg,rgba(217,103,93,.9),rgba(217,103,93,.15),rgba(236,232,223,.06),rgba(95,181,154,.15),rgba(95,181,154,.9))}
 .toast{background:var(--bg2);border-radius:6px}
 
 /* Панель депозита */
@@ -162,7 +161,7 @@ td{font-size:13px}
 .depo.four{grid-template-columns:repeat(4,1fr)}
 .cb{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
 .cbi{border:1px solid var(--bd);border-radius:6px;padding:14px 16px;background:var(--bg)}
-.cbi.warn{border-color:rgba(238,102,112,.55)}
+.cbi.warn{border-color:rgba(217,103,93,.55)}
 .cbh{display:flex;justify-content:space-between;align-items:baseline;font-size:13px}
 .cbn{font-weight:700;font-size:14px}
 .cbv{font:500 20px 'Inter',sans-serif;margin:6px 0 2px}
@@ -189,42 +188,15 @@ td{font-size:13px}
 .total td{font-weight:700;border-top:1px solid var(--bdh)}
 .tw.scroll{max-height:480px;overflow:auto}
 .tw.scroll th{position:sticky;top:0;background:var(--card);z-index:1}
-
-/* ===== ЯРКАЯ ТЕМА ===== */
-body{background-image:radial-gradient(900px 520px at 6% -6%,rgba(124,92,255,.17),transparent 62%),radial-gradient(800px 480px at 100% 0,rgba(232,180,79,.10),transparent 60%),radial-gradient(900px 600px at 82% 104%,rgba(71,203,161,.09),transparent 60%);background-attachment:fixed}
-.logo{background:linear-gradient(135deg,#e8b44f,#ff7a59 55%,#c05cff);border:none}
-.logo::after{color:#0b0e14}
-.subtitle{color:var(--tx2)}
-.stats .stat,.depo .stat{box-shadow:inset 0 2px 0 var(--blue)}
-.stats .stat.green,.depo .stat.green{box-shadow:inset 0 2px 0 var(--green)}
-.stats .stat.red,.depo .stat.red{box-shadow:inset 0 2px 0 var(--red)}
-.stats .stat.gold,.depo .stat.gold{box-shadow:inset 0 2px 0 var(--gold)}
-.stats .stat.cyan,.depo .stat.cyan{box-shadow:inset 0 2px 0 var(--cyan)}
-.stat:first-child .sv{text-shadow:0 0 34px color-mix(in srgb,currentColor 18%,transparent)}
-.tab[aria-selected=true]{border-image:linear-gradient(90deg,#e8b44f,#ff7a59 60%,#c05cff) 1}
-.btn:hover{box-shadow:0 0 0 1px var(--blue),0 6px 22px rgba(232,180,79,.18)}
-.card{box-shadow:0 1px 0 rgba(255,255,255,.03) inset}
-.card:hover{border-color:rgba(232,180,79,.25)}
-.cbi:hover{border-color:rgba(232,180,79,.35)}
-
-/* ===== ПОДСКАЗКИ ===== */
-.hint{display:inline-grid;place-items:center;width:15px;height:15px;margin-left:7px;border-radius:50%;border:1px solid var(--txm);color:var(--txm);font:700 10px/1 'Inter',sans-serif;font-style:normal;letter-spacing:0;text-transform:none;cursor:help;vertical-align:middle;user-select:none}
-.hint:hover,.hint:focus-visible{color:#0b0e14;background:var(--blue);border-color:var(--blue);outline:none}
-#tipbox{position:fixed;z-index:10001;max-width:310px;padding:11px 13px;background:#171c27;border:1px solid var(--bdh);border-radius:8px;box-shadow:0 14px 44px rgba(0,0,0,.65);font:400 12.5px/1.5 'Inter',sans-serif;color:var(--tx);pointer-events:none}
-#tipbox[hidden]{display:none}
-
-/* ===== ЗАКРЕПЛЁННЫЕ ФИЛЬТРЫ (только на широких экранах: на телефоне они занимают слишком много места) ===== */
-@media(min-width:901px){.filters{position:sticky;top:0;z-index:30;padding-top:12px;background:rgba(11,14,20,.94);backdrop-filter:blur(10px)}}
 </style>
 </head>
 <body>
 <div id="loading" role="status"><div class="loader"></div><div class="lt">Загружаю данные…</div></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<div id="tipbox" role="tooltip" hidden></div>
 
 <main class="container" id="dashboard">
 <header class="header">
-  <div class="brand"><div class="logo" aria-hidden="true">📊</div><div><h1>Trading Pro Analytics</h1><div class="subtitle">Дашборд трейдера · значок <b>i</b> рядом с показателем открывает пояснение</div></div></div>
+  <div class="brand"><div class="logo" aria-hidden="true">📊</div><div><h1>Trading Pro Analytics</h1><div class="subtitle">Дашборд трейдера</div></div></div>
   <div class="hc">
     <div class="live" id="status"><span class="dot"></span><span id="statusText">Подключение…</span></div>
     <span class="last" id="lastUpdated"></span>
@@ -235,7 +207,7 @@ body{background-image:radial-gradient(900px 520px at 6% -6%,rgba(124,92,255,.17)
 <div id="errbox" role="alert"><span id="errText"></span><button class="btn" type="button" id="retryBtn">Повторить</button></div>
 
 <section class="filters" aria-label="Фильтры">
-  <span class="fl" id="pl" data-hint="period">Период:</span>
+  <span class="fl" id="pl">Период:</span>
   <div class="pills" id="periodFilter" role="group" aria-labelledby="pl">
     <button class="pill" data-period="today" aria-pressed="false">Сегодня</button>
     <button class="pill" data-period="7" aria-pressed="false">7Д</button>
@@ -271,58 +243,58 @@ body{background-image:radial-gradient(900px 520px at 6% -6%,rgba(124,92,255,.17)
 
 <section class="depo four" id="riskPanel" aria-label="Просадка и скользящие метрики"></section>
 
-<section class="card"><div class="ch"><div class="ct" data-hint="equity">Накопленный PnL</div><div class="badge" id="equityBadge">—</div></div>
+<section class="card"><div class="ch"><div class="ct">Накопленный PnL</div><div class="badge" id="equityBadge">—</div></div>
 <div class="cc lg"><canvas id="equityChart" role="img" aria-label="График накопленного PnL"></canvas></div></section>
 
-<section class="card"><div class="ch"><div class="ct" data-hint="underwater">Просадка от пика</div></div>
+<section class="card"><div class="ch"><div class="ct">Просадка от пика</div></div>
 <div class="cc xs"><canvas id="ddChart" role="img" aria-label="График просадки от пика в процентах"></canvas></div></section>
 
-<section class="card"><div class="ch"><div class="ct" data-hint="rolling">Скользящие метрики</div><div class="badge" id="rollBadge">—</div></div>
+<section class="card"><div class="ch"><div class="ct">Скользящие метрики</div><div class="badge" id="rollBadge">—</div></div>
 <div class="g2e" id="rollWrap">
-  <div><div class="mini" data-hint="expectancy">Матожидание, $ на сделку</div><div class="cc sm"><canvas id="rollExpChart" role="img" aria-label="Скользящее матожидание"></canvas></div></div>
-  <div><div class="mini" data-hint="winrate">Winrate, %</div><div class="cc sm"><canvas id="rollWrChart" role="img" aria-label="Скользящий winrate"></canvas></div></div>
+  <div><div class="mini">Матожидание, $ на сделку</div><div class="cc sm"><canvas id="rollExpChart" role="img" aria-label="Скользящее матожидание"></canvas></div></div>
+  <div><div class="mini">Winrate, %</div><div class="cc sm"><canvas id="rollWrChart" role="img" aria-label="Скользящий winrate"></canvas></div></div>
 </div>
 <div class="hnote" id="rollMsg" style="display:none"></div>
 <div class="hnote" id="rollNote"></div></section>
 </div>
 
 <div class="panel" id="panel-coins" role="tabpanel" aria-labelledby="tab-coins" hidden>
-<section class="card" id="coinBalCard" style="display:none"><div class="ch"><div class="ct" data-hint="coinbal">Баланс по монетам</div><div class="badge" id="coinBalBadge"></div></div>
+<section class="card" id="coinBalCard" style="display:none"><div class="ch"><div class="ct">Баланс по монетам</div><div class="badge" id="coinBalBadge"></div></div>
 <div class="cb" id="coinBalances"></div><div class="hnote" id="coinBalNote"></div></section>
 
-<section class="card"><div class="ch"><div class="ct" data-hint="coineq">Накопленный PnL по монетам</div></div>
+<section class="card"><div class="ch"><div class="ct">Накопленный PnL по монетам</div></div>
 <div class="cc lg"><canvas id="coinEqChart" role="img" aria-label="Накопленный PnL по каждой монете"></canvas></div>
 <div class="hnote">Цвет монеты постоянный и не зависит от места в рейтинге. Клик по названию в легенде скрывает линию. Все линии начинаются с нуля в начале выбранного периода.</div></section>
 
-<section class="card"><div class="ch"><div class="ct" data-hint="coinstats">Статистика по активам</div><div class="badge" id="coinsCount">0 активов</div></div>
+<section class="card"><div class="ch"><div class="ct">Статистика по активам</div><div class="badge" id="coinsCount">0 активов</div></div>
 <div class="tw"><table id="coinTable"><caption style="position:absolute;left:-9999px">Статистика по активам</caption>
-<thead><tr><th scope="col">Актив</th><th scope="col">Сделок</th><th scope="col" data-hint="winrate">Winrate</th><th scope="col" data-hint="roi">Net PnL</th><th scope="col" data-hint="avg">Средняя</th><th scope="col" data-hint="best">Лучшая</th><th scope="col" data-hint="worst">Худшая</th><th scope="col" data-hint="status">Статус</th></tr></thead><tbody></tbody></table></div></section>
+<thead><tr><th scope="col">Актив</th><th scope="col">Сделок</th><th scope="col">Winrate</th><th scope="col">Net PnL</th><th scope="col">Средняя</th><th scope="col">Лучшая</th><th scope="col">Худшая</th><th scope="col">Статус</th></tr></thead><tbody></tbody></table></div></section>
 </div>
 
 <div class="panel" id="panel-time" role="tabpanel" aria-labelledby="tab-time" hidden>
-<section class="card"><div class="ch"><div class="ct" data-hint="months">По месяцам</div><div class="badge" id="monthBadge">—</div></div>
-<div class="tw"><table id="monthTable"><thead><tr><th scope="col">Месяц</th><th scope="col">Сделок</th><th scope="col" data-hint="winrate">Winrate</th><th scope="col" data-hint="pnlnet">PnL</th><th scope="col" data-hint="pctdepo">% к депо</th></tr></thead><tbody></tbody></table></div>
+<section class="card"><div class="ch"><div class="ct">По месяцам</div><div class="badge" id="monthBadge">—</div></div>
+<div class="tw"><table id="monthTable"><thead><tr><th scope="col">Месяц</th><th scope="col">Сделок</th><th scope="col">Winrate</th><th scope="col">PnL</th><th scope="col">% к депо</th></tr></thead><tbody></tbody></table></div>
 <div class="hnote" id="monthNote"></div></section>
 
 <div class="g2">
-  <section class="card"><div class="ch"><div class="ct" data-hint="daily">Дневной PnL</div></div><div class="cc"><canvas id="dailyChart" role="img" aria-label="Дневной PnL"></canvas></div></section>
-  <section class="card"><div class="ch"><div class="ct" data-hint="dow">PnL по дням недели</div></div><div class="cc"><canvas id="dayOfWeekChart" role="img" aria-label="PnL по дням недели"></canvas></div></section>
+  <section class="card"><div class="ch"><div class="ct">Дневной PnL</div></div><div class="cc"><canvas id="dailyChart" role="img" aria-label="Дневной PnL"></canvas></div></section>
+  <section class="card"><div class="ch"><div class="ct">PnL по дням недели</div></div><div class="cc"><canvas id="dayOfWeekChart" role="img" aria-label="PnL по дням недели"></canvas></div></section>
 </div>
 
-<section class="card"><div class="ch"><div class="ct" data-hint="heat">Тепловая карта: время суток и день недели</div></div>
+<section class="card"><div class="ch"><div class="ct">Тепловая карта: время суток и день недели</div></div>
 <div id="heatmapContainer"></div></section>
 </div>
 
 <div class="panel" id="panel-trades" role="tabpanel" aria-labelledby="tab-trades" hidden>
 <div class="g2e">
-  <section class="card"><div class="ch"><div class="ct" data-hint="dist">Распределение PnL по сделкам</div></div><div class="cc sm"><canvas id="distributionChart" role="img" aria-label="Гистограмма PnL"></canvas></div></section>
-  <section class="card"><div class="ch"><div class="ct" data-hint="ls">Лонги и шорты</div></div><div class="cc sm"><canvas id="longShortChart" role="img" aria-label="PnL по направлениям"></canvas></div></section>
+  <section class="card"><div class="ch"><div class="ct">Распределение PnL по сделкам</div></div><div class="cc sm"><canvas id="distributionChart" role="img" aria-label="Гистограмма PnL"></canvas></div></section>
+  <section class="card"><div class="ch"><div class="ct">Лонги и шорты</div></div><div class="cc sm"><canvas id="longShortChart" role="img" aria-label="PnL по направлениям"></canvas></div></section>
 </div>
 
-<section class="card"><div class="ch"><div class="ct" data-hint="insights">Выводы</div></div><div id="insightsContainer"></div></section>
+<section class="card"><div class="ch"><div class="ct">Выводы</div></div><div id="insightsContainer"></div></section>
 
-<section class="card"><div class="ch"><div class="ct" data-hint="trades">Последние сделки</div></div>
-<div class="tw scroll"><table id="tradesTable"><thead><tr><th scope="col">Закрыта</th><th scope="col">Монета</th><th scope="col">Направление</th><th scope="col" data-hint="pnlnet">PnL</th></tr></thead><tbody id="tradesBody"></tbody></table></div>
+<section class="card"><div class="ch"><div class="ct">Последние сделки</div></div>
+<div class="tw scroll"><table id="tradesTable"><thead><tr><th scope="col">Закрыта</th><th scope="col">Монета</th><th scope="col">Направление</th><th scope="col">PnL</th></tr></thead><tbody id="tradesBody"></tbody></table></div>
 <div class="hnote" id="tradesNote"></div></section>
 </div>
 </div>
@@ -371,65 +343,6 @@ const dayKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')
 const isLong = t => /ЛОНГ|LONG|BUY/i.test(t.direction);
 const isShort = t => /ШОРТ|SHORT|SELL/i.test(t.direction);
 
-/* ============ ПОДСКАЗКИ ============ */
-// Пояснения к показателям. В HTML достаточно data-hint="ключ": значок «i» добавляется автоматически.
-const H = {
-  deposit: 'Общая сумма, выделенная на торговлю: число монет × сумма на одну монету (по умолчанию 1000 USDT).',
-  balance: 'Расчётная величина: депозит плюс весь накопленный PnL из таблицы. Реальный баланс на бирже может отличаться.',
-  pnl: 'Чистый результат закрытых сделок за выбранный период, в USDT. Процент считается от общего депозита.',
-  winrate: 'Доля прибыльных сделок. Сама по себе ничего не доказывает: 40% при крупных прибылях и мелких убытках лучше, чем 60% при обратной картине.',
-  pf: 'Сумма всех прибылей, делённая на сумму всех убытков. Выше 1 значит, что стратегия в плюсе; от 1,5 считается хорошим запасом прочности.',
-  expectancy: 'Средний результат одной сделки в USDT. Если он положителен, то на длинной дистанции стратегия зарабатывает.',
-  maxdd: 'Самое большое падение накопленного результата от максимума до следующего минимума. Процент считается от баланса в момент пика. Показывает, какую просадку нужно уметь пережить.',
-  sharpe: 'Средний результат сделки, делённый на разброс результатов: чем выше, тем ровнее прибыль. Считается на сделку, а не за год, поэтому с чужими цифрами не сравнивайте. Sortino учитывает только разброс убытков, Payoff это средняя прибыль к среднему убытку.',
-  series: 'Самая длинная цепочка прибыльных сделок подряд. Ниже указана самая длинная цепочка убыточных: к такой серии неудач стоит быть готовым.',
-  curdd: 'Насколько накопленный результат сейчас ниже своего максимума за выбранный период и сколько времени прошло с этого максимума. «Нет» значит, что результат на пике.',
-  longdd: 'Самый долгий промежуток времени, в течение которого результат не обновлял максимум. Показывает, как долго иногда приходится ждать восстановления.',
-  wr20: 'Winrate только по последним сделкам скользящего окна (размер задаётся в настройках, по умолчанию 20). Рядом значение за весь период. Заметно более низкое значение может говорить об ухудшении, но на малой выборке это бывает и просто шумом.',
-  exp20: 'Средний результат сделки только по последним сделкам окна (по умолчанию 20). Рядом значение за весь период. Если оно стало отрицательным при положительном среднем, стоит присмотреться к стратегии.',
-  equity: 'Сумма результатов всех сделок в порядке закрытия. Растущая линия значит, что стратегия зарабатывает; глубокие провалы показывают периоды просадок.',
-  underwater: 'На сколько процентов результат ниже своего предыдущего максимума в каждый момент. Ноль значит новый максимум. Чем глубже и длиннее впадина, тем тяжелее был период.',
-  rolling: 'Матожидание и winrate по скользящему окну из последних сделок. Пунктир показывает среднее за весь период. Устойчивое снижение линии ниже пунктира повод пересмотреть стратегию.',
-  coinbal: 'У каждой монеты свои выделенные USDT. Показано, сколько осталось с учётом её PnL; монеты, потерявшие больше порога (по умолчанию 15%), подсвечены красным. Не зависит от выбранного периода.',
-  coineq: 'Накопленный PnL каждой монеты отдельно; все линии стартуют с нуля в начале периода. Цвет монеты постоянный. Клик по названию в легенде скрывает линию.',
-  coinstats: 'Итоги по каждой монете за выбранный период. Процент в скобках считается от выделенных на монету USDT.',
-  roi: 'Чистый PnL монеты за период. В скобках процент от выделенных на неё USDT.',
-  avg: 'Средний результат одной сделки по монете.',
-  best: 'Самая прибыльная сделка по монете за период.',
-  worst: 'Самая убыточная сделка по монете за период.',
-  status: 'ТОП: PnL выше нуля и winrate выше 55%. В МИНУСЕ: PnL ниже нуля. МАЛО ДАННЫХ: меньше 5 сделок, выводам верить рано. СТАНДАРТ: все остальные.',
-  months: 'Итоги по календарным месяцам. Помогает понять, стабильна ли стратегия или весь результат сделан одним удачным месяцем.',
-  pctdepo: 'Результат в процентах от общего депозита.',
-  pnlnet: 'Чистый результат в USDT.',
-  daily: 'Сумма результатов всех сделок, закрытых в этот день.',
-  dow: 'Сумма PnL по дням недели. При небольшом числе сделок разница между днями может оказаться случайной.',
-  heat: 'Сумма PnL за каждые 2 часа и день недели (время как в таблице). Зелёный это прибыль, красный убыток, пустая ячейка значит, что сделок не было. На малой выборке это скорее шум, чем закономерность.',
-  dist: 'Сколько сделок дало результат в каждом диапазоне PnL. Хороший признак: правая часть (прибыль) длиннее и выше левой.',
-  ls: 'Суммарный PnL лонгов и шортов по отдельности. Показывает, в какую сторону стратегия работает лучше.',
-  trades: 'Последние 100 закрытых сделок с учётом фильтров, новые сверху.',
-  insights: 'Автоматические замечания по выбранным данным. Это подсказки, а не рекомендации: на малой выборке они ненадёжны.',
-  period: 'Период отсчитывается от последней сделки в таблице, а не от сегодняшней даты.'
-};
-const hint = key => H[key] ? `<span class="hint" tabindex="0" role="button" aria-label="Пояснение: ${esc(H[key])}" data-tip="${esc(H[key])}">i</span>` : '';
-function initHints() { document.querySelectorAll('[data-hint]').forEach(el => { if (!el.querySelector('.hint')) el.insertAdjacentHTML('beforeend', hint(el.dataset.hint)); }); }
-
-/* Всплывающее пояснение: мышь (наведение), клавиатура (фокус, Esc), телефон (касание; касание в другом месте закрывает) */
-function showTip(el) {
-  const box = $('tipbox'); box.textContent = el.dataset.tip; box.hidden = false;
-  const r = el.getBoundingClientRect(), w = box.offsetWidth, h = box.offsetHeight;
-  const x = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, innerWidth - w - 8));
-  const y = r.bottom + 8 + h > innerHeight - 8 ? Math.max(8, r.top - h - 8) : r.bottom + 8;
-  box.style.left = x + 'px'; box.style.top = y + 'px'; el.setAttribute('aria-describedby', 'tipbox');
-}
-function hideTip() { const box = $('tipbox'); box.hidden = true; document.querySelectorAll('.hint[aria-describedby]').forEach(h => h.removeAttribute('aria-describedby')); }
-document.addEventListener('mouseover', e => { const h = e.target.closest && e.target.closest('.hint'); if (h) showTip(h); });
-document.addEventListener('mouseout', e => { if (e.target.closest && e.target.closest('.hint')) hideTip(); });
-document.addEventListener('focusin', e => { if (e.target.classList && e.target.classList.contains('hint')) showTip(e.target); });
-document.addEventListener('focusout', e => { if (e.target.classList && e.target.classList.contains('hint')) hideTip(); });
-document.addEventListener('click', e => { const h = e.target.closest && e.target.closest('.hint'); if (h) { e.preventDefault(); showTip(h); } else hideTip(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') hideTip(); });
-window.addEventListener('scroll', hideTip, {passive: true});
-
 /* ============ ДЕПОЗИТ ============ */
 // Число монет берём по всем сделкам в таблице (не по фильтру периода), чтобы депо не «прыгал».
 // Если выбрана одна монета, депо = 1 × DEPOSIT_PER_COIN.
@@ -449,8 +362,8 @@ function depoPanel() {
   const pnl = scope.reduce((s, t) => s + t.pnlNet, 0), bal = dep + pnl;
   const pc = pnl >= 0 ? 'green' : 'red';
   el.innerHTML = `
-  <div class="stat blue"><div class="sl">Общий депозит${hint('deposit')}</div><div class="sv">${usd0(dep)}</div><div class="ss">${n} ${n === 1 ? 'монета' : 'монет'} × ${usd0(per)}</div></div>
-  <div class="stat ${pc}"><div class="sl">Текущий баланс${hint('balance')}</div><div class="sv">${usd(bal)}</div><div class="ss">PnL за всё время ${pnl >= 0 ? '+' : ''}${usd(pnl)} (${(pnl / dep * 100).toFixed(1)}%)</div></div>
+  <div class="stat blue"><div class="sl">Общий депозит</div><div class="sv">${usd0(dep)}</div><div class="ss">${n} ${n === 1 ? 'монета' : 'монет'} × ${usd0(per)}</div></div>
+  <div class="stat ${pc}"><div class="sl">Текущий баланс</div><div class="sv">${usd(bal)}</div><div class="ss">PnL за всё время ${pnl >= 0 ? '+' : ''}${usd(pnl)} (${(pnl / dep * 100).toFixed(1)}%)</div></div>
 `;
 }
 
@@ -709,7 +622,7 @@ function analyze(trades, base) {
 }
 
 /* ============ ОТРИСОВКА ============ */
-const tip = {backgroundColor: 'rgba(9,12,16,.95)', borderColor: 'rgba(232,180,79,.3)', borderWidth: 1, padding: 10};
+const tip = {backgroundColor: 'rgba(9,12,16,.95)', borderColor: 'rgba(200,169,106,.3)', borderWidth: 1, padding: 10};
 const grid = {color: 'rgba(236,232,223,.04)'};
 function mk(key, id, cfg) { if (charts[key]) charts[key].destroy(); charts[key] = new Chart($(id), cfg); }
 const fmtN = v => Number.isFinite(v) ? nf.format(v) : '∞';
@@ -718,12 +631,12 @@ function updateDashboard(trades, prior = 0) {
   const dep = getDeposit(), a = analyze(trades, dep + prior);
   const pc = a.total >= 0 ? 'green' : 'red', wc = a.winrate >= 50 ? 'green' : 'red', fc = a.pf >= 1.5 ? 'green' : a.pf >= 1 ? 'gold' : 'red';
   $('statsGrid').innerHTML = `
-  <div class="stat ${pc}"><div class="sl">Суммарный PnL${hint('pnl')}</div><div class="sv" data-v="${a.total}" data-f="usd">${usd(a.total)}</div><div class="ss">${a.n} сделок · ${(a.total / dep * 100).toFixed(1)}% к депо ${usd0(dep)}</div></div>
-  <div class="stat ${wc}"><div class="sl">Winrate${hint('winrate')}</div><div class="sv" data-v="${a.winrate}" data-f="pct">${a.winrate.toFixed(1)}%</div><div class="ss">${a.wins} побед · ${a.losses} убытков${a.be ? ' · ' + a.be + ' в ноль' : ''}</div></div>
-  <div class="stat ${fc}"><div class="sl">Profit Factor${hint('pf')}</div><div class="sv">${fmtN(a.pf)}</div><div class="ss">Матожидание ${usd(a.expectancy)}</div></div>
-  <div class="stat red"><div class="sl">Макс. просадка${hint('maxdd')}</div><div class="sv" data-v="${a.maxDD}" data-f="usd">${usd(a.maxDD)}</div><div class="ss">${a.maxDDPct.toFixed(1)}% от депо ${usd0(dep)}</div></div>
-  <div class="stat blue"><div class="sl">Sharpe (на сделку)${hint('sharpe')}</div><div class="sv">${nf.format(a.sharpe)}</div><div class="ss">Sortino ${nf.format(a.sortino)} · Payoff ${fmtN(a.payoff)}</div></div>
-  <div class="stat cyan"><div class="sl">Серии${hint('series')}</div><div class="sv">${a.maxW} побед</div><div class="ss">Макс. убытков подряд: ${a.maxL}</div></div>`;
+  <div class="stat ${pc}"><div class="sl">Суммарный PnL</div><div class="sv" data-v="${a.total}" data-f="usd">${usd(a.total)}</div><div class="ss">${a.n} сделок · ${(a.total / dep * 100).toFixed(1)}% к депо ${usd0(dep)}</div></div>
+  <div class="stat ${wc}"><div class="sl">Winrate</div><div class="sv" data-v="${a.winrate}" data-f="pct">${a.winrate.toFixed(1)}%</div><div class="ss">${a.wins} побед · ${a.losses} убытков${a.be ? ' · ' + a.be + ' в ноль' : ''}</div></div>
+  <div class="stat ${fc}"><div class="sl">Profit Factor</div><div class="sv">${fmtN(a.pf)}</div><div class="ss">Матожидание ${usd(a.expectancy)}</div></div>
+  <div class="stat red"><div class="sl">Макс. просадка</div><div class="sv" data-v="${a.maxDD}" data-f="usd">${usd(a.maxDD)}</div><div class="ss">${a.maxDDPct.toFixed(1)}% от депо ${usd0(dep)}</div></div>
+  <div class="stat blue"><div class="sl">Sharpe (на сделку)</div><div class="sv">${nf.format(a.sharpe)}</div><div class="ss">Sortino ${nf.format(a.sortino)} · Payoff ${fmtN(a.payoff)}</div></div>
+  <div class="stat cyan"><div class="sl">Серии</div><div class="sv">${a.maxW} побед</div><div class="ss">Макс. убытков подряд: ${a.maxL}</div></div>`;
   animateStats();
 
   const b = $('equityBadge'); b.className = 'badge ' + pc; b.textContent = (a.total >= 0 ? '+' : '') + usd(a.total);
@@ -755,8 +668,8 @@ const fmtDate = d => d.toLocaleDateString('ru-RU', {day: '2-digit', month: '2-di
 function equityChart(trades, eq) {
   mk('equity', 'equityChart', {type: 'line', data: {
     labels: trades.map(t => fmtDate(t.date)),
-    datasets: [{label: 'Накопленный PnL', data: eq.map(e => e.value), borderColor: '#e8b44f', borderWidth: 2.5, fill: true, tension: 0, pointRadius: 0, pointHoverRadius: 5,
-      backgroundColor: c => { const g = c.chart.ctx.createLinearGradient(0, 0, 0, c.chart.height || 400); g.addColorStop(0, 'rgba(232,180,79,.25)'); g.addColorStop(1, 'rgba(232,180,79,0)'); return g; }}]},
+    datasets: [{label: 'Накопленный PnL', data: eq.map(e => e.value), borderColor: '#c8a96a', borderWidth: 2.5, fill: true, tension: 0, pointRadius: 0, pointHoverRadius: 5,
+      backgroundColor: c => { const g = c.chart.ctx.createLinearGradient(0, 0, 0, c.chart.height || 400); g.addColorStop(0, 'rgba(200,169,106,.25)'); g.addColorStop(1, 'rgba(200,169,106,0)'); return g; }}]},
     options: {responsive: true, maintainAspectRatio: false, interaction: {mode: 'index', intersect: false},
     plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {title: i => `Сделка №${i[0].dataIndex + 1} · ${i[0].label}`, label: c => `Накопленный PnL: ${usd(c.parsed.y)}`}}},
     scales: {x: {grid: {display: false}, ticks: {maxTicksLimit: XT(8), font: {size: 10}}}, y: {grid, ticks: {callback: v => usd0(v), font: {size: 10}}, afterFit: s => { s.width = 64; }}}}});
@@ -765,7 +678,7 @@ function equityChart(trades, eq) {
 function underwaterChart(eq, trades) {
   mk('dd', 'ddChart', {type: 'line', data: {
     labels: trades.map(t => fmtDate(t.date)),
-    datasets: [{label: 'Просадка от пика, %', data: eq.map(e => -e.ddPct), borderColor: '#ee6670', backgroundColor: 'rgba(238,102,112,.18)', fill: true, borderWidth: 1.5, tension: 0, pointRadius: 0, pointHoverRadius: 4}]},
+    datasets: [{label: 'Просадка от пика, %', data: eq.map(e => -e.ddPct), borderColor: '#d9675d', backgroundColor: 'rgba(217,103,93,.18)', fill: true, borderWidth: 1.5, tension: 0, pointRadius: 0, pointHoverRadius: 4}]},
     options: {responsive: true, maintainAspectRatio: false, interaction: {mode: 'index', intersect: false},
     plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {title: i => `Сделка №${i[0].dataIndex + 1} · ${i[0].label}`, label: c => `Просадка: ${(-c.parsed.y).toFixed(1)}% (${usd(-eq[c.dataIndex].drawdown)})`}}},
     scales: {x: {grid: {display: false}, ticks: {maxTicksLimit: XT(8), font: {size: 10}}}, y: {max: 0, suggestedMin: -1, grid, ticks: {callback: v => (Math.round(v * 10) / 10) + '%', font: {size: 10}}, afterFit: s => { s.width = 64; }}}}});
@@ -817,7 +730,7 @@ function setTab(name, focus) {
 function dailyChart(d) {
   const keys = Object.keys(d).sort(), v = keys.map(k => d[k]);
   mk('daily', 'dailyChart', {type: 'bar', data: {labels: keys.map(k => { const [y, m, dd] = k.split('-'); return `${dd}.${m}`; }),
-    datasets: [{data: v, backgroundColor: v.map(x => x >= 0 ? 'rgba(71,203,161,.6)' : 'rgba(238,102,112,.6)'), borderRadius: 4}]},
+    datasets: [{data: v, backgroundColor: v.map(x => x >= 0 ? 'rgba(95,181,154,.6)' : 'rgba(217,103,93,.6)'), borderRadius: 4}]},
     options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {label: c => usd(c.parsed.y)}}},
     scales: {x: {grid: {display: false}, ticks: {maxTicksLimit: XT(8), font: {size: 10}, maxRotation: 0}}, y: {grid, ticks: {callback: x => usd0(x), font: {size: 10}}}}}});
 }
@@ -832,7 +745,7 @@ function distChart(trades) {
   p.forEach(x => bk[Math.min(bins - 1, Math.floor((x - lo0) / size))]++);
   const mid = i => lo0 + (i + .5) * size;
   mk('dist', 'distributionChart', {type: 'bar', data: {labels: bk.map((_, i) => `${usd0(lo0 + i * size)}…${usd0(lo0 + (i + 1) * size)}`),
-    datasets: [{data: bk, backgroundColor: bk.map((_, i) => mid(i) >= 0 ? 'rgba(71,203,161,.6)' : 'rgba(238,102,112,.6)'), borderRadius: 4}]},
+    datasets: [{data: bk, backgroundColor: bk.map((_, i) => mid(i) >= 0 ? 'rgba(95,181,154,.6)' : 'rgba(217,103,93,.6)'), borderRadius: 4}]},
     options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {label: c => `${c.parsed.y} сделок`}}},
     scales: {x: {grid: {display: false}, ticks: {font: {size: 9}, maxRotation: 45, autoSkip: true, maxTicksLimit: XT(6)}}, y: {grid, ticks: {precision: 0, font: {size: 10}}}}}});
 }
@@ -840,13 +753,13 @@ function lsChart(L, S) {
   const st = a => ({pnl: a.reduce((s, t) => s + t.pnlNet, 0), wr: a.length ? a.filter(t => t.pnlNet > 0).length / a.length * 100 : 0, n: a.length});
   const l = st(L), s = st(S), vals = [l.pnl, s.pnl];
   mk('ls', 'longShortChart', {type: 'bar', data: {labels: [`Лонги (${l.n})`, `Шорты (${s.n})`],
-    datasets: [{data: vals, backgroundColor: vals.map(v => v >= 0 ? 'rgba(71,203,161,.6)' : 'rgba(238,102,112,.6)'), borderRadius: 6}]},
+    datasets: [{data: vals, backgroundColor: vals.map(v => v >= 0 ? 'rgba(95,181,154,.6)' : 'rgba(217,103,93,.6)'), borderRadius: 6}]},
     options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {label: c => `PnL: ${usd(c.parsed.y)} · WR ${[l, s][c.dataIndex].wr.toFixed(0)}%`}}},
     scales: {x: {grid: {display: false}}, y: {grid, ticks: {callback: v => usd0(v), font: {size: 10}}}}}});
 }
 function dowChart(dow) {
   const v = ORDER.map(i => dow[i].total), c = ORDER.map(i => dow[i].count);
-  mk('dow', 'dayOfWeekChart', {type: 'bar', data: {labels: ORDER.map(i => DAYS[i]), datasets: [{data: v, backgroundColor: v.map(x => x >= 0 ? 'rgba(71,203,161,.6)' : 'rgba(238,102,112,.6)'), borderRadius: 6}]},
+  mk('dow', 'dayOfWeekChart', {type: 'bar', data: {labels: ORDER.map(i => DAYS[i]), datasets: [{data: v, backgroundColor: v.map(x => x >= 0 ? 'rgba(95,181,154,.6)' : 'rgba(217,103,93,.6)'), borderRadius: 6}]},
     options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}, tooltip: {...tip, callbacks: {label: x => `${usd(x.parsed.y)} (${c[x.dataIndex]} сделок)`}}},
     scales: {x: {grid: {display: false}}, y: {grid, ticks: {callback: x => usd0(x), font: {size: 10}}}}}});
 }
@@ -867,10 +780,10 @@ function heatmap(heat) {
     html += `<div class="hr" role="row"><div class="hl" role="rowheader">${r.label}</div>`;
     r.cells.forEach((c, i) => {
       const k = Math.min(1, Math.abs(c.sum) / max);
-      const bg = c.n === 0 ? 'rgba(236,232,223,.03)' : c.sum > 0 ? `rgba(71,203,161,${.15 + k * .75})` : c.sum < 0 ? `rgba(238,102,112,${.15 + k * .75})` : 'rgba(232,180,79,.12)';
+      const bg = c.n === 0 ? 'rgba(236,232,223,.03)' : c.sum > 0 ? `rgba(95,181,154,${.15 + k * .75})` : c.sum < 0 ? `rgba(217,103,93,${.15 + k * .75})` : 'rgba(200,169,106,.12)';
       const rs = Math.round(Math.abs(c.sum)), txt = c.n === 0 ? '' : rs === 0 ? '0' : (c.sum > 0 ? '+' : '−') + rs;
       const tt = c.n ? `${DAYS[ORDER[i]]} ${r.label}: ${usd(c.sum)}, ${c.n} сделок, winrate ${(c.w / c.n * 100).toFixed(0)}%` : `${DAYS[ORDER[i]]} ${r.label}: сделок нет`;
-      html += `<div class="hc2" role="cell" style="background:${bg};color:${c.n && k > .5 ? '#0b0e14' : '#fff'}" title="${tt}" aria-label="${tt}">${txt}</div>`;
+      html += `<div class="hc2" role="cell" style="background:${bg}" title="${tt}" aria-label="${tt}">${txt}</div>`;
     });
     html += '</div>';
   });
@@ -913,15 +826,15 @@ function coinBalances() {
 function riskPanel(a) {
   const W = CONFIG.ROLL_WINDOW, last = a.roll.length ? a.roll[a.roll.length - 1] : null;
   const cur = a.curDD > 0.005
-    ? `<div class="stat red"><div class="sl">Текущая просадка${hint('curdd')}</div><div class="sv">${usd(-a.curDD)}</div><div class="ss">${a.curDDPct.toFixed(1)}% от пика · уже ${fmtDays(a.curDDMs / 864e5)}</div></div>`
-    : `<div class="stat green"><div class="sl">Текущая просадка${hint('curdd')}</div><div class="sv">Нет</div><div class="ss">Результат на максимуме за период</div></div>`;
-  const longest = `<div class="stat blue"><div class="sl">Самая долгая просадка${hint('longdd')}</div><div class="sv">${a.maxDD > 0 ? fmtDays(a.maxDDDays) : '—'}</div><div class="ss">Макс. глубина ${usd(a.maxDD)} (${a.maxDDPct.toFixed(1)}%)</div></div>`;
+    ? `<div class="stat red"><div class="sl">Текущая просадка</div><div class="sv">${usd(-a.curDD)}</div><div class="ss">${a.curDDPct.toFixed(1)}% от пика · уже ${fmtDays(a.curDDMs / 864e5)}</div></div>`
+    : `<div class="stat green"><div class="sl">Текущая просадка</div><div class="sv">Нет</div><div class="ss">Результат на максимуме за период</div></div>`;
+  const longest = `<div class="stat blue"><div class="sl">Самая долгая просадка</div><div class="sv">${a.maxDD > 0 ? fmtDays(a.maxDDDays) : '—'}</div><div class="ss">Макс. глубина ${usd(a.maxDD)} (${a.maxDDPct.toFixed(1)}%)</div></div>`;
   const wr = last
-    ? `<div class="stat ${last.wr >= a.winrate ? 'green' : 'red'}"><div class="sl">Winrate, последние ${W}${hint('wr20')}</div><div class="sv">${last.wr.toFixed(0)}%</div><div class="ss">За период ${a.winrate.toFixed(1)}%</div></div>`
-    : `<div class="stat blue"><div class="sl">Winrate, последние ${W}${hint('wr20')}</div><div class="sv">—</div><div class="ss">Нужно минимум ${W} сделок (сейчас ${a.n})</div></div>`;
+    ? `<div class="stat ${last.wr >= a.winrate ? 'green' : 'red'}"><div class="sl">Winrate, последние ${W}</div><div class="sv">${last.wr.toFixed(0)}%</div><div class="ss">За период ${a.winrate.toFixed(1)}%</div></div>`
+    : `<div class="stat blue"><div class="sl">Winrate, последние ${W}</div><div class="sv">—</div><div class="ss">Нужно минимум ${W} сделок (сейчас ${a.n})</div></div>`;
   const ex = last
-    ? `<div class="stat ${last.exp >= 0 ? 'green' : 'red'}"><div class="sl">Матожидание, последние ${W}${hint('exp20')}</div><div class="sv">${usd(last.exp)}</div><div class="ss">За период ${usd(a.expectancy)} на сделку</div></div>`
-    : `<div class="stat blue"><div class="sl">Матожидание, последние ${W}${hint('exp20')}</div><div class="sv">—</div><div class="ss">Нужно минимум ${W} сделок (сейчас ${a.n})</div></div>`;
+    ? `<div class="stat ${last.exp >= 0 ? 'green' : 'red'}"><div class="sl">Матожидание, последние ${W}</div><div class="sv">${usd(last.exp)}</div><div class="ss">За период ${usd(a.expectancy)} на сделку</div></div>`
+    : `<div class="stat blue"><div class="sl">Матожидание, последние ${W}</div><div class="sv">—</div><div class="ss">Нужно минимум ${W} сделок (сейчас ${a.n})</div></div>`;
   $('riskPanel').innerHTML = cur + longest + wr + ex;
 }
 
@@ -947,9 +860,9 @@ function rollingChart(a, trades) {
     options: {responsive: true, maintainAspectRatio: false, interaction: {mode: 'index', intersect: false},
     plugins: {legend: {labels: {usePointStyle: true, font: {size: 11}}}, tooltip: {...tip, callbacks: {title: i => `Сделка №${a.roll[i[0].dataIndex].i + 1} · ${i[0].label}`, label: c => `${c.dataset.label}: ${fmt(c.parsed.y)}`}}},
     scales: {x: {grid: {display: false}, ticks: {maxTicksLimit: XT(6), font: {size: 10}}}, y: {...yExtra, ticks: {callback: v => fmt(v), font: {size: 10}}}}}});
-  one('rollExp', 'rollExpChart', `Окно ${W} сделок`, a.roll.map(r => r.exp), a.expectancy, '#e8b44f', usd,
+  one('rollExp', 'rollExpChart', `Окно ${W} сделок`, a.roll.map(r => r.exp), a.expectancy, '#c8a96a', usd,
       {grid: {color: c => c.tick && c.tick.value === 0 ? 'rgba(236,232,223,.28)' : 'rgba(236,232,223,.04)'}});
-  one('rollWr', 'rollWrChart', `Окно ${W} сделок`, a.roll.map(r => r.wr), a.winrate, '#e8b44f', v => v.toFixed(0) + '%', {min: 0, max: 100, grid});
+  one('rollWr', 'rollWrChart', `Окно ${W} сделок`, a.roll.map(r => r.wr), a.winrate, '#c8a96a', v => v.toFixed(0) + '%', {min: 0, max: 100, grid});
 }
 
 /* Таблица по месяцам: PnL, % к текущему депо, winrate */
@@ -1040,7 +953,6 @@ $('content').querySelector('.tabs').addEventListener('keydown', e => {
 });
 window.addEventListener('hashchange', () => setTab(location.hash.slice(1)));
 setTab(location.hash.slice(1));
-initHints();
 loadData();
 </script>
 </body>
